@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, BigInteger, ForeignKey, String
 from sqlalchemy.orm import relationship
 from app.config.database import Base
 
+
 class OrderItem(Base):
     __tablename__ = "order_items"
 

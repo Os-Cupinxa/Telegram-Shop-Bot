@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text
 from app.config.database import Base
 
+
 class Message(Base):
     __tablename__ = "messages"
 
