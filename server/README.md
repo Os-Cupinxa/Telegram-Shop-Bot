@@ -9,7 +9,7 @@ pip install -r requirements.txt
 ## Rodar o servidor FastAPI:
 
 ```bash
-uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload
 ```
 
 ## Swagger do FastAPI:
