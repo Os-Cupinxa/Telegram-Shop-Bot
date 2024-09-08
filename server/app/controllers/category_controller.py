@@ -26,7 +26,7 @@ def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
     return category_service.create_category(db, category)
 
 
-@router.post("/categories/update", response_model=CategoryResponse, tags=["Categories"])
+@router.put("/categories/", response_model=CategoryResponse, tags=["Categories"])
 def update_category(category_id: int, category: CategoryCreate, db: Session = Depends(get_db)):
     return category_service.update_category(db, category_id, category)
 

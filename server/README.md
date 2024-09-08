@@ -6,6 +6,18 @@
 pip install -r requirements.txt
 ```
 
+## Verifique se já existe um processo rodando na porta 8000:
+
+```bash
+netstat -ano | findstr :8000
+```
+
+## Encerre o Processo (se necessário)::
+
+```bash
+taskkill /PID <PID> /F
+```
+
 ## Rodar o servidor FastAPI:
 
 ```bash
