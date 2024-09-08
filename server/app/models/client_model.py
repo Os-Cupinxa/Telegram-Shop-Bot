@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, BigInteger, String, Boolean
 from sqlalchemy.orm import relationship
 from app.config.database import Base
 
+
 class Client(Base):
     __tablename__ = "clients"
 
