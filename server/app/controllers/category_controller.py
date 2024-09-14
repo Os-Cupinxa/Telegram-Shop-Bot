@@ -15,10 +15,7 @@ def read_categories(db: Session = Depends(get_db)):
 
 @router.get("/categories/{category_id}", response_model=CategoryResponse, tags=["Categories"])
 def read_category(category_id: int, db: Session = Depends(get_db)):
-    db_category = category_service.get_category(db, category_id)
-    if db_category is None:
-        raise HTTPException(status_code=404, detail="Category not found")
-    return db_category
+    return category_service.get_category(db, category_id)
 
 
 @router.post("/categories/", response_model=CategoryResponse, tags=["Categories"])

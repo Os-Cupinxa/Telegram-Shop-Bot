@@ -7,7 +7,6 @@ class Client(Base):
     __tablename__ = "clients"
 
     id = Column(Integer, primary_key=True, index=True)
-    chat_id = Column(BigInteger, unique=True, nullable=False)
     name = Column(String(255))
     phone_number = Column(String(255))
     city = Column(String(255))
