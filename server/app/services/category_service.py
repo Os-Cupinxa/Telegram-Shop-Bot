@@ -1,6 +1,4 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
 
 from app.models.category_model import Category
 from app.schemas.category_schema import CategoryCreate
