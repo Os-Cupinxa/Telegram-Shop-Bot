@@ -1,8 +1,10 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
+
 from app.models.category_model import Category
 from app.schemas.category_schema import CategoryCreate
+from app.services.global_service import get_object_by_id
 
 
 def get_all_categories(db: Session):
@@ -10,7 +12,9 @@ def get_all_categories(db: Session):
 
 
 def get_category(db: Session, category_id: int):
-    return db.query(Category).filter(and_(Category.id == category_id)).first()
+    db_category = get_object_by_id(db, Category, category_id, "Category not found")
+
+    return db_category
 
 
 def create_category(db: Session, category: CategoryCreate):
@@ -22,9 +26,8 @@ def create_category(db: Session, category: CategoryCreate):
 
 
 def update_category(db: Session, category_id: int, category: CategoryCreate):
-    db_category = db.query(Category).filter(and_(Category.id == category_id)).first()
-    if db_category is None:
-        raise HTTPException(status_code=404, detail="Category not found")
+    db_category = get_object_by_id(db, Category, category_id, "Category not found")
+
     db_category.name = category.name
     db.commit()
     db.refresh(db_category)
@@ -32,9 +35,8 @@ def update_category(db: Session, category_id: int, category: CategoryCreate):
 
 
 def delete_category(db: Session, category_id: int):
-    db_category = db.query(Category).filter(and_(Category.id == category_id)).first()
-    if db_category is None:
-        raise HTTPException(status_code=404, detail="Category not found")
+    db_category = get_object_by_id(db, Category, category_id, "Category not found")
+
     db.delete(db_category)
     db.commit()
     return {"message": "Category deleted"}

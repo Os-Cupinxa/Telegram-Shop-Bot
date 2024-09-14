@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.config.database import engine, Base
-from app.controllers import user_controller, category_controller
+from app.controllers import user_controller, category_controller, order_controller
 
 Base.metadata.create_all(bind=engine)
 
@@ -10,6 +10,9 @@ tags_metadata = [
     },
     {
         "name": "Categories"
+    },
+    {
+        "name": "Orders"
     },
     {
         "name": "Clients"
@@ -24,3 +27,4 @@ app = FastAPI(
 
 app.include_router(user_controller.router)
 app.include_router(category_controller.router)
+app.include_router(order_controller.router)
