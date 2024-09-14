@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, BigInteger, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, Float
 from sqlalchemy.orm import relationship
 from app.config.database import Base
 
@@ -11,7 +11,7 @@ class Product(Base):
     photo_url = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=False)
-    price = Column(BigInteger, nullable=False)
+    price = Column(Float, nullable=False)
 
     category = relationship("Category", back_populates="products")
     order_items = relationship("OrderItem", back_populates="product")
