@@ -1,12 +1,11 @@
 from datetime import datetime
 
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
 
 from app.models import Client
 from app.models.order_model import Order
 from app.schemas.order_schema import OrderCreate
+from app.services.global_service import get_object_by_id
 
 
 def get_all_orders(db: Session):
@@ -14,19 +13,13 @@ def get_all_orders(db: Session):
 
 
 def get_order(db: Session, order_id: int):
-    order = db.query(Order).filter(and_(Order.id == order_id)).first()
+    db_order = get_object_by_id(db, Order, order_id, "Order not found")
 
-    if order is None:
-        raise HTTPException(status_code=404, detail="Order not found")
-
-    return order
+    return db_order
 
 
 def create_order(db: Session, order: OrderCreate):
-    client = db.query(Client).filter(and_(Client.id == order.client_id)).first()
-
-    if client is None:
-        raise HTTPException(status_code=404, detail="Client not found")
+    get_object_by_id(db, Client, order.client_id, "Client not found")
 
     db_order = Order(
         client_id=order.client_id,
@@ -41,14 +34,8 @@ def create_order(db: Session, order: OrderCreate):
 
 
 def update_order(db: Session, order_id: int, order: OrderCreate):
-    db_order = db.query(Order).filter(and_(Order.id == order_id)).first()
-    client = db.query(Client).filter(and_(Client.id == order.client_id)).first()
-
-    if db_order is None:
-        raise HTTPException(status_code=404, detail="Order not found")
-
-    if client is None:
-        raise HTTPException(status_code=404, detail="Client not found")
+    db_order = get_object_by_id(db, Order, order_id, "Order not found")
+    get_object_by_id(db, Client, order.client_id, "Client not found")
 
     db_order.client_id = order.client_id
     db_order.status = order.status
@@ -59,10 +46,7 @@ def update_order(db: Session, order_id: int, order: OrderCreate):
 
 
 def delete_order(db: Session, order_id: int):
-    db_order = db.query(Order).filter(and_(Order.id == order_id)).first()
-
-    if db_order is None:
-        raise HTTPException(status_code=404, detail="Order not found")
+    db_order = get_object_by_id(db, Order, order_id, "Order not found")
 
     db.delete(db_order)
     db.commit()
