@@ -42,9 +42,13 @@ def create_order(db: Session, order: OrderCreate):
 
 def update_order(db: Session, order_id: int, order: OrderCreate):
     db_order = db.query(Order).filter(and_(Order.id == order_id)).first()
+    client = db.query(Client).filter(and_(Client.id == order.client_id)).first()
 
     if db_order is None:
         raise HTTPException(status_code=404, detail="Order not found")
+
+    if client is None:
+        raise HTTPException(status_code=404, detail="Client not found")
 
     db_order.client_id = order.client_id
     db_order.status = order.status
