@@ -1,0 +1,41 @@
+{% extends 'common/home.html' %}
+
+{% block content %}
+{% if request.GET.error %}
+<div class="alert alert-warning" role="alert">
+  Invalid username or password.
+</div>
+{% endif %}
+
+{% if request.GET.logout %}
+<div class="alert alert-success" role="alert">
+  You are logged out.
+</div>
+{% endif %}
+
+<form action="{% url 'login' %}" method="post">
+  {% csrf_token %}
+  <div class="form-group row">
+    <label class="col-sm-2">Username:</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="username" required>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-sm-2">Password:</label>
+    <div class="col-sm-10">
+      <input type="password" class="form-control" name="password" required>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-sm-2">Remember me:</label>
+    <div class="col-sm-10">
+      <input type="checkbox" name="remember-me" checked>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Sign In</button>
+</form>
+{% endblock %}
