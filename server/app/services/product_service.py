@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.models import Category
+from app.models import Category, OrderItem
 from app.models.product_model import Product
 from app.schemas.product_schema import ProductCreate
 from app.services.global_service import get_object_by_id
@@ -46,6 +46,11 @@ def update_product(db: Session, product_id: int, product: ProductCreate):
 
 def delete_product(db: Session, product_id: int):
     db_product = get_object_by_id(db, Product, product_id, "Product not found")
+
+    order_items = db.query(OrderItem).filter(OrderItem.product_id == product_id).first()
+
+    if order_items:
+        return {"error": "Cannot delete product. There are orders associated with this product."}
 
     db.delete(db_product)
     db.commit()

@@ -13,4 +13,4 @@ class Order(Base):
     amount = Column(BigInteger, nullable=False)
 
     client = relationship("Client", back_populates="orders")
-    order_items = relationship("OrderItem", back_populates="order")
+    order_items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")

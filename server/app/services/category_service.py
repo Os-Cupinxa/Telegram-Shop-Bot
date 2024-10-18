@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.models import Product
 from app.models.category_model import Category
 from app.schemas.category_schema import CategoryCreate
 from app.services.global_service import get_object_by_id
@@ -34,6 +35,11 @@ def update_category(db: Session, category_id: int, category: CategoryCreate):
 
 def delete_category(db: Session, category_id: int):
     db_category = get_object_by_id(db, Category, category_id, "Category not found")
+
+    products = db.query(Product).filter(Product.category_id == category_id).first()
+
+    if products:
+        return {"error": "Cannot delete category. There are products associated with this category."}
 
     db.delete(db_category)
     db.commit()

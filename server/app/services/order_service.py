@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.models import Client
+from app.models import Client, OrderItem
 from app.models.order_model import Order
 from app.schemas.order_schema import OrderCreate
 from app.services.global_service import get_object_by_id

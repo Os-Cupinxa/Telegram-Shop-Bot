@@ -11,6 +11,6 @@ class Client(Base):
     phone_number = Column(String(255))
     city = Column(String(255))
     address = Column(String(255))
-    is_active = Column(Boolean, nullable=False)
+    is_active = Column(Boolean, nullable=False, default=True)
 
     orders = relationship("Order", back_populates="client")
