@@ -1,0 +1,78 @@
+{% extends 'common/home.html' %}
+
+{% block content %}
+<h1>User Editing</h1>
+
+{% if error %}
+<div class="alert alert-warning" role="alert">
+  <h4 class="alert-heading">Error</h4>
+  <hr>{{ error }}
+</div>
+{% endif %}
+
+{% if user %}
+<form method="post" action="{% url 'users_edit' user.id %}">
+  {% csrf_token %}
+  <div class="form-group row">
+    <label class="col-sm-2">Id:</label>
+    <div class="col-sm-10">
+      <input class="form-control" type="number" name="id" value="{{ user.id }}" readonly>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-sm-2">Name:</label>
+    <div class="col-sm-10">
+      <input class="form-control" name="name" value="{{ user.name }}">
+      {% if name_error %}<div class="text-warning">{{ name_error }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-sm-2">Username:</label>
+    <div class="col-sm-10">
+      <input class="form-control" name="username" value="{{ user.username }}">
+      {% if username_error %}<div class="text-warning">{{ username_error }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-sm-2">Password:</label>
+    <div class="col-sm-10">
+      <input class="form-control" name="password">
+      {% if password_error %}<div class="text-warning">{{ password_error }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-sm-2">Role:</label>
+    <div class="col-sm-10">
+      <select class="form-control" name="role">
+        {% for role in roles %}
+        <option value="{{ role.name }}">{{ role.value }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <button class="btn btn-success" type="submit">Update</button>
+</form>
+
+<form method="get" action="{% url 'users_list' %}">
+  <button class="btn btn-info" type="submit">Back</button>
+</form>
+
+<form method="post" action="{% url 'users_delete' %}">
+  {% csrf_token %}
+  <input type="hidden" name="id" value="{{ user.id }}">
+  <button class="btn btn-danger" type="submit">Delete</button>
+</form>
+
+{% else %}
+<div class="alert alert-danger" role="alert">
+  <h4 class="alert-heading">Error</h4>
+  <hr>This user does not exist!
+</div>
+{% endif %}
+
+{% endblock %}
