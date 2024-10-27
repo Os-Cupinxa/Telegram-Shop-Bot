@@ -21,7 +21,7 @@ taskkill /PID <PID> /F
 ## Rodar o servidor FastAPI:
 
 ```bash
-python -m uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload --port 8001
 ```
 
 ## Swagger do FastAPI:

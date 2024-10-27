@@ -16,9 +16,19 @@ def get_client(db: Session, client_id: int):
     return db_client
 
 
+def get_client_by_cpf(db: Session, cpf: str):
+    client = db.query(Client).filter(Client.cpf == cpf).first()
+
+    if not client:
+        return {"error": "There is no client registered with this CPF."}
+
+    return client
+
+
 def create_client(db: Session, client: ClientCreate):
     db_client = Client(
         name=client.name,
+        cpf=client.cpf,
         phone_number=client.phone_number,
         city=client.city,
         address=client.address
@@ -34,10 +44,11 @@ def update_client(db: Session, client_id: int, client: ClientCreate):
     db_client = get_object_by_id(db, Client, client_id, "Client not found")
 
     db_client.name = client.name
-    db_client.phone_number=client.phone_number
-    db_client.city=client.city
-    db_client.address=client.address
-    db_client.is_active=client.is_active
+    db_client.cpf = client.cpf
+    db_client.phone_number = client.phone_number
+    db_client.city = client.city
+    db_client.address = client.address
+    db_client.is_active = client.is_active
     db.commit()
     db.refresh(db_client)
     return db_client

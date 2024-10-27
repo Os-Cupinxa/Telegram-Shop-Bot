@@ -8,6 +8,7 @@ class Client(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255))
+    cpf = Column(String(11))
     phone_number = Column(String(255))
     city = Column(String(255))
     address = Column(String(255))

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class ClientBase(BaseModel):
     name: str
+    cpf: str
     phone_number: str
     city: str
     address: str
