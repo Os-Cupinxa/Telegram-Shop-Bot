@@ -1,19 +1,3 @@
-#!/usr/bin/env python
-# pylint: disable=unused-argument
-# This program is dedicated to the public domain under the CC0 license.
-
-"""
-First, a few callback functions are defined. Then, those functions are passed to
-the Application and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-
-Usage:
-Example of a bot-user conversation using ConversationHandler.
-Send /iniciar to initiate the conversation.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
-
 import logging
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
@@ -25,8 +9,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-from register import *
-from already_registered import *
+from registering import *
 
 # Enable logging
 logging.basicConfig(
@@ -36,7 +19,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-AFTER_START, ALREADY_REGISTERED, AFTER_ALREADY_REGISTERED, CHECK_USER_BY_CPF, REGISTER = range(5)
+AFTER_START, ALREADY_REGISTERED, AFTER_ALREADY_REGISTERED, CHECK_USER_BY_CPF, REGISTERING_PROCESS = range(5)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -61,8 +44,9 @@ async def after_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
         await update.message.reply_text("Certo! Por favor, informe seu CPF:")
         return ALREADY_REGISTERED
     elif user_response == "Não":
-        await register(update, context)
-        return REGISTER
+        context.registering_step = 0
+        await registering_process(update, context)
+        return REGISTERING_PROCESS
     else:
         await update.message.reply_text(
             "Por favor, responda apenas com 'Sim' ou 'Não'."
@@ -71,7 +55,6 @@ async def after_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Cancels and ends the conversation."""
     user = update.message.from_user
     logger.info("Usuário %s cancelou a conversa.", user.first_name)
     await update.message.reply_text(
@@ -90,7 +73,7 @@ def main() -> None:
             AFTER_START: [MessageHandler(filters.TEXT, after_start)],
             ALREADY_REGISTERED: [MessageHandler(filters.TEXT, already_registered)],
             CHECK_USER_BY_CPF: [MessageHandler(filters.TEXT, check_user_by_cpf)],
-            REGISTER: [MessageHandler(filters.TEXT, register)],
+            REGISTERING_PROCESS: [MessageHandler(filters.TEXT, registering_process)],
         },
         fallbacks=[CommandHandler("cancelar", cancel)],
     )
