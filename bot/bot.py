@@ -73,7 +73,7 @@ def main() -> None:
             AFTER_START: [MessageHandler(filters.TEXT, after_start)],
             ALREADY_REGISTERED: [MessageHandler(filters.TEXT, already_registered)],
             CHECK_USER_BY_CPF: [MessageHandler(filters.TEXT, check_user_by_cpf)],
-            REGISTERING_PROCESS: [MessageHandler(filters.TEXT, registering_process)],
+            REGISTERING_PROCESS: [MessageHandler(filters.TEXT | filters.CONTACT, registering_process)],
         },
         fallbacks=[CommandHandler("cancelar", cancel)],
     )

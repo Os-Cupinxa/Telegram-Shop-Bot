@@ -1,5 +1,5 @@
 import httpx
-from telegram import Update
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler
 
 from bot import CHECK_USER_BY_CPF, ALREADY_REGISTERED, REGISTERING_PROCESS
@@ -53,12 +53,20 @@ async def registering_process(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     elif step == 2:
         context.user_data["cpf"] = update.message.text
-        await update.message.reply_text("Perfeito! Agora, informe seu número de telefone.")
+
+        phone_button = KeyboardButton("Enviar meu número de telefone", request_contact=True)
+        reply_markup = ReplyKeyboardMarkup([[phone_button]], one_time_keyboard=True)
+        await update.message.reply_text("Por favor, compartilhe seu número de telefone.", reply_markup=reply_markup)
+
         context.user_data["registering_step"] += 1
         return REGISTERING_PROCESS
 
     elif step == 3:
-        context.user_data["phone_number"] = update.message.text
+        if update.message.contact:
+            context.user_data["phone_number"] = update.message.contact.phone_number
+        else:
+            context.user_data["phone_number"] = update.message.text
+
         await update.message.reply_text("Quase lá! Agora, informe sua cidade.")
         context.user_data["registering_step"] += 1
         return REGISTERING_PROCESS
