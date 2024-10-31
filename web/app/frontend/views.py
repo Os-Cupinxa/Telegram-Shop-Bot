@@ -3,6 +3,13 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # Importe o modelo de usuário
+from .models import Product
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+from .models import Product, Category  # Assumindo que temos um modelo Product e Category
+from django.contrib import messages
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -54,3 +61,61 @@ def users_delete(request):
         user.delete()
         return redirect('users_list')
     return redirect('users_list')
+
+
+# views.py
+
+
+@login_required
+def products_list(request):
+    products = Product.objects.all()
+    return render(request, 'main/products/all.html', {'products': products})
+
+@login_required
+@csrf_exempt
+def product_add(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        category_id = request.POST.get('category')
+        price = request.POST.get('price')
+        category = get_object_or_404(Category, id=category_id)
+        photoUrl = request.POST.get('photo')
+
+        product = Product(name=name, description=description, category=category, price=price, photoUrl=photoUrl)
+        product.save()
+        return redirect('products_list')
+
+    categories = Category.objects.all()
+    return render(request, 'main/products/add.html', {'categories': categories})
+
+@login_required
+@csrf_exempt
+def product_edit(request, id):
+    product = get_object_or_404(Product, id=id)
+    if request.method == 'POST':
+        product.name = request.POST.get('name')
+        product.description = request.POST.get('description')
+        category_id = request.POST.get('category')
+        product.category = get_object_or_404(Category, id=category_id)
+        product.price = request.POST.get('price')
+
+        if 'photo' in request.FILES:
+            product.photo = request.FILES['photo']
+
+        product.save()
+        return redirect('products_list')
+
+    categories = Category.objects.all()
+    return render(request, 'main/products/edit.html', {'product': product, 'categories': categories})
+
+@login_required
+@csrf_exempt
+def product_delete(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('id')
+        product = get_object_or_404(Product, id=product_id)
+        product.delete()
+        messages.success(request, "Product deleted successfully")
+        return redirect('products_list')
+    return redirect('products_list')
