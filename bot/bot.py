@@ -1,14 +1,16 @@
 import logging
 
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
     CommandHandler,
     ContextTypes,
     ConversationHandler,
     MessageHandler,
-    filters,
+    filters, CallbackQueryHandler,
 )
+
+from catalogue import *
 from registering import *
 
 # Enable logging
@@ -19,38 +21,33 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-AFTER_START, ALREADY_REGISTERED, AFTER_ALREADY_REGISTERED, CHECK_USER_BY_CPF, REGISTERING_PROCESS = range(5)
+AFTER_START, SHOW_CATALOGUE_CATEGORIES, ALREADY_REGISTERED, AFTER_ALREADY_REGISTERED, CHECK_USER_BY_CPF, REGISTERING_PROCESS = range(
+    6)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    reply_keyboard = [["Sim", "Não"]]
+    reply_keyboard = [
+        [InlineKeyboardButton("🛒 Carrinho", callback_data="carrinho"),
+         InlineKeyboardButton("📦 Catálogo", callback_data="catalogo")]
+    ]
 
     await update.message.reply_text(
-        "Olá! Seja bem vindo a loja. "
-        "Envie /cancelar para parar a conversa.\n\n"
-        "Já possui um cadastro?",
-        reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, one_time_keyboard=True, input_field_placeholder="Sim ou não?"
-        ),
+        "Olá! Seja bem-vindo à loja. Como posso ajudar?",
+        reply_markup=InlineKeyboardMarkup(reply_keyboard)
     )
 
     return AFTER_START
 
 
 async def after_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user_response = update.message.text
+    query = update.callback_query
+    await query.answer()
 
-    if user_response == "Sim":
-        await update.message.reply_text("Certo! Por favor, informe seu CPF:")
-        return ALREADY_REGISTERED
-    elif user_response == "Não":
-        context.registering_step = 0
-        await registering_process(update, context)
-        return REGISTERING_PROCESS
-    else:
-        await update.message.reply_text(
-            "Por favor, responda apenas com 'Sim' ou 'Não'."
-        )
+    if query.data == "catalogo":
+        await show_catalogue_categories(update, context)
+        return SHOW_CATALOGUE_CATEGORIES
+    elif query.data == "carrinho":
+        await query.edit_message_text("Você clicou no carrinho!")
         return AFTER_START
 
 
@@ -70,7 +67,8 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("iniciar", start)],
         states={
-            AFTER_START: [MessageHandler(filters.TEXT, after_start)],
+            AFTER_START: [CallbackQueryHandler(after_start)],
+            SHOW_CATALOGUE_CATEGORIES: [MessageHandler(filters.TEXT, show_catalogue_categories)],
             ALREADY_REGISTERED: [MessageHandler(filters.TEXT, already_registered)],
             CHECK_USER_BY_CPF: [MessageHandler(filters.TEXT, check_user_by_cpf)],
             REGISTERING_PROCESS: [MessageHandler(filters.TEXT | filters.CONTACT, registering_process)],
