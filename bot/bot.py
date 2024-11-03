@@ -21,8 +21,8 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-AFTER_START, SHOW_CATALOGUE_CATEGORIES, ALREADY_REGISTERED, AFTER_ALREADY_REGISTERED, CHECK_USER_BY_CPF, REGISTERING_PROCESS = range(
-    6)
+AFTER_START, SHOW_CATALOGUE_CATEGORIES, ASK_FOR_QUANTITY, ALREADY_REGISTERED, AFTER_ALREADY_REGISTERED, CHECK_USER_BY_CPF, REGISTERING_PROCESS = range(
+    7)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -69,6 +69,7 @@ def main() -> None:
         states={
             AFTER_START: [CallbackQueryHandler(after_start)],
             SHOW_CATALOGUE_CATEGORIES: [MessageHandler(filters.TEXT, show_catalogue_categories)],
+            ASK_FOR_QUANTITY: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_quantity)],
             ALREADY_REGISTERED: [MessageHandler(filters.TEXT, already_registered)],
             CHECK_USER_BY_CPF: [MessageHandler(filters.TEXT, check_user_by_cpf)],
             REGISTERING_PROCESS: [MessageHandler(filters.TEXT | filters.CONTACT, registering_process)],

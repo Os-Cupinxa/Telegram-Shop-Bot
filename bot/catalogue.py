@@ -11,8 +11,6 @@ async def show_catalogue_categories(update: Update, context: ContextTypes.DEFAUL
 
     categories_data = response.json()
 
-    print(categories_data)
-
     if response.status_code != 200:
         await update.message.reply_text("Erro ao buscar categorias.")
         return ConversationHandler.END
@@ -78,6 +76,9 @@ async def display_product(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         next_button = InlineKeyboardButton("Próximo", callback_data=f"next_product_{current_index}")
         keyboard.append(next_button)
 
+    add_to_cart_button = InlineKeyboardButton("Adicionar ao Carrinho", callback_data="add_to_cart")
+    keyboard.append(add_to_cart_button)
+
     if keyboard:
         reply_markup = InlineKeyboardMarkup([keyboard])
     else:
@@ -101,3 +102,46 @@ async def navigate_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     context.user_data['current_product_index'] = current_index
 
     await display_product(update, context)
+
+
+async def add_to_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    from bot import ASK_FOR_QUANTITY
+
+    query = update.callback_query
+    await query.answer()
+
+    await query.message.reply_text("Por favor, digite a quantidade de itens que deseja adicionar ao carrinho:")
+    return ASK_FOR_QUANTITY
+
+
+async def handle_quantity(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int | None:
+    try:
+        quantity = int(update.message.text)
+
+        if quantity <= 0:
+            await update.message.reply_text("Por favor, insira uma quantidade válida (maior que 0).")
+            return
+
+        current_index = context.user_data.get('current_product_index', 0)
+        products = context.user_data.get('products', [])
+        product = products[current_index]
+
+        if 'cart' not in context.user_data:
+            context.user_data['cart'] = []
+
+        cart = context.user_data['cart']
+
+        for item in cart:
+            if item['product_id'] == product['id']:
+                item['quantity'] += quantity
+                break
+        else:
+            cart.append({'product_id': product['id'], 'quantity': quantity})
+
+        await update.message.reply_text(f"Adicionado {quantity} de {product['name']} ao carrinho.")
+
+    except ValueError:
+        await update.message.reply_text("Por favor, insira um número válido.")
+
+    return ConversationHandler.END
+
