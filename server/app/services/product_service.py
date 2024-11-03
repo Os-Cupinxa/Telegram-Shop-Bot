@@ -16,6 +16,10 @@ def get_product(db: Session, product_id: int):
     return db_product
 
 
+def get_products_by_category(db: Session, category_id: int):
+    return db.query(Product).filter(Product.category_id == category_id).all()
+
+
 def create_product(db: Session, product: ProductCreate):
     get_object_by_id(db, Category, product.category_id, "Category not found")
 
