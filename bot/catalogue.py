@@ -76,6 +76,7 @@ async def display_product(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         next_button = InlineKeyboardButton("Próximo", callback_data=f"next_product_{current_index}")
         keyboard.append(next_button)
 
+    # TODO botão ainda não funciona
     add_to_cart_button = InlineKeyboardButton("Adicionar ao Carrinho", callback_data="add_to_cart")
     keyboard.append(add_to_cart_button)
 
