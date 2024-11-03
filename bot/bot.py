@@ -77,6 +77,8 @@ def main() -> None:
     )
 
     application.add_handler(conv_handler)
+    application.add_handler(CallbackQueryHandler(show_products, pattern=r'show_products_\d+'))
+    application.add_handler(CallbackQueryHandler(navigate_product, pattern=r'prev_product_\d+|next_product_\d+'))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
