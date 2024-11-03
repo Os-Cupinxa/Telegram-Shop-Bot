@@ -69,12 +69,19 @@ async def display_product(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     )
 
     keyboard = []
-    if current_index > 0:
-        keyboard.append([InlineKeyboardButton("Anterior", callback_data=f"prev_product_{current_index}")])
-    if current_index < len(products) - 1:
-        keyboard.append([InlineKeyboardButton("Próximo", callback_data=f"next_product_{current_index}")])
 
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    if current_index > 0:
+        previous_button = InlineKeyboardButton("Anterior", callback_data=f"prev_product_{current_index}")
+        keyboard.append(previous_button)
+
+    if current_index < len(products) - 1:
+        next_button = InlineKeyboardButton("Próximo", callback_data=f"next_product_{current_index}")
+        keyboard.append(next_button)
+
+    if keyboard:
+        reply_markup = InlineKeyboardMarkup([keyboard])
+    else:
+        reply_markup = None
 
     await update.callback_query.message.reply_text(product_text, reply_markup=reply_markup, parse_mode='Markdown')
 
