@@ -9,7 +9,7 @@ pip install -r requirements.txt
 ## Verifique se já existe um processo rodando na porta 8000:
 
 ```bash
-netstat -ano | findstr :8000
+netstat -ano | findstr :8001
 ```
 
 ## Encerre o Processo (se necessário)::
