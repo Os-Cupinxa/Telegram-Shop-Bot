@@ -2,8 +2,6 @@ import httpx
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler
 
-from bot import CHECK_USER_BY_CPF, ALREADY_REGISTERED, REGISTERING_PROCESS
-
 
 async def already_registered(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     cpf_input = update.message.text
@@ -11,10 +9,8 @@ async def already_registered(update: Update, context: ContextTypes.DEFAULT_TYPE)
     if cpf_input.isdigit() and len(cpf_input) == 11:
         context.user_data['cpf'] = cpf_input
         await check_user_by_cpf(update, context)
-        return CHECK_USER_BY_CPF
     else:
         await update.message.reply_text("Por favor, informe um CPF válido com 11 dígitos.")
-        return ALREADY_REGISTERED
 
 
 async def check_user_by_cpf(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
