@@ -66,24 +66,23 @@ async def display_product(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         f"[Imagem]({product['photo_url']})"
     )
 
-    keyboard = []
-
+    navigation_buttons = []
     if current_index > 0:
         previous_button = InlineKeyboardButton("Anterior", callback_data=f"prev_product_{current_index}")
-        keyboard.append(previous_button)
+        navigation_buttons.append(previous_button)
 
     if current_index < len(products) - 1:
         next_button = InlineKeyboardButton("Próximo", callback_data=f"next_product_{current_index}")
-        keyboard.append(next_button)
+        navigation_buttons.append(next_button)
 
-    # TODO botão ainda não funciona
-    add_to_cart_button = InlineKeyboardButton("Adicionar ao Carrinho", callback_data="add_to_cart")
+    add_to_cart_button = [InlineKeyboardButton("Adicionar ao Carrinho", callback_data="add_to_cart")]
+
+    keyboard = []
+    if navigation_buttons:
+        keyboard.append(navigation_buttons)
     keyboard.append(add_to_cart_button)
 
-    if keyboard:
-        reply_markup = InlineKeyboardMarkup([keyboard])
-    else:
-        reply_markup = None
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.callback_query.message.reply_text(product_text, reply_markup=reply_markup, parse_mode='Markdown')
 
