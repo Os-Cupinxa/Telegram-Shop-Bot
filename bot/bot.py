@@ -63,6 +63,8 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(get_products, pattern=r'show_products-.*'))
     application.add_handler(CallbackQueryHandler(navigate_product, pattern=r'prev_product|next_product'))
     application.add_handler(CallbackQueryHandler(add_to_cart, pattern=r'add_to_cart-.*'))
+    application.add_handler(CallbackQueryHandler(prompt_remove_item, pattern=r'prompt_remove_item'))
+    application.add_handler(CallbackQueryHandler(confirm_remove_from_cart, pattern=r'confirm_remove_item-.*'))
 
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_quantity))
 

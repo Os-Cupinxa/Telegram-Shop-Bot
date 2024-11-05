@@ -66,42 +66,79 @@ async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     cart = context.user_data.get('cart', [])
 
     if not cart:
+        keyboard = [[InlineKeyboardButton("📦 Catálogo", callback_data="go_to-catalogue")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
         if update.callback_query:
-            await update.callback_query.message.reply_text("Seu carrinho está vazio.")
+            await update.callback_query.message.reply_text("Seu carrinho está vazio.", reply_markup=reply_markup)
         else:
-            await update.message.reply_text("Seu carrinho está vazio.")
+            await update.message.reply_text("Seu carrinho está vazio.", reply_markup=reply_markup)
         return
 
     total_cart_value = 0
     cart_message = "Seu carrinho contém:\n"
 
     for item in cart:
-        product_id = item['product_id']
-        quantity = item['quantity']
         product = item['product']
+        quantity = item['quantity']
+        unit_price = product['price']
+        total_price = unit_price * quantity
+        total_cart_value += total_price
 
-        if product:
-            unit_price = product['price']
-            total_price = unit_price * quantity
-            total_cart_value += total_price
-            cart_message += (
-                f"**Produto:** {product['name']}\n"
-                f"**Quantidade:** {quantity}\n"
-                f"**Valor unitário:** R${unit_price:.2f}\n"
-                f"**Total:** R${total_price:.2f}\n\n"
-            )
-        else:
-            cart_message += f"Produto com ID {product_id} não encontrado.\n"
+        cart_message += (
+            f"**Produto:** {product['name']}\n"
+            f"**Quantidade:** {quantity}\n"
+            f"**Valor unitário:** R${unit_price:.2f}\n"
+            f"**Total:** R${total_price:.2f}\n\n"
+        )
 
     cart_message += f"**Total do carrinho:** R${total_cart_value:.2f}"
 
-    reply_keyboard = [
+    keyboard = [
         [InlineKeyboardButton("🛒 Finalizar pedido", callback_data="c-finishPurchase"),
-         InlineKeyboardButton("📦 Catálogo", callback_data="go_to-catalogue")]
+         InlineKeyboardButton("📦 Catálogo", callback_data="go_to-catalogue")],
+        [InlineKeyboardButton("❌ Remover item", callback_data="prompt_remove_item")]
     ]
-    reply_markup = InlineKeyboardMarkup(reply_keyboard)
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
     if update.callback_query:
         await update.callback_query.message.reply_text(cart_message, parse_mode='Markdown', reply_markup=reply_markup)
     else:
         await update.message.reply_text(cart_message, parse_mode='Markdown', reply_markup=reply_markup)
+
+
+async def prompt_remove_item(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+
+    cart = context.user_data.get('cart', [])
+    if not cart:
+        await query.message.reply_text("Seu carrinho está vazio.")
+        return
+
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                f"❌ {item['product']['name']} - {item['quantity']}x (R${item['quantity'] * item['product']['price']:.2f})",
+                callback_data=f"confirm_remove_item-{item['product_id']}"
+            )
+        ]
+        for item in cart
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await query.message.reply_text("Selecione o item que deseja remover:", reply_markup=reply_markup)
+
+
+async def confirm_remove_from_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+
+    product_id = int(query.data.split("-")[1])
+    cart = context.user_data.get('cart', [])
+
+    cart = [item for item in cart if item['product_id'] != product_id]
+    context.user_data['cart'] = cart
+
+    await query.message.reply_text("Item removido do carrinho.")
+    await show_cart(update, context)
