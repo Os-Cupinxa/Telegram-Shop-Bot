@@ -35,7 +35,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
-async def after_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def go_to(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
     page = query.data.split("-")[1]
@@ -59,7 +59,7 @@ def main() -> None:
     application.add_handler(CommandHandler("cancelar", cancel))
     application.add_handler(CommandHandler("carrinho", show_cart))
 
-    application.add_handler(CallbackQueryHandler(after_start, pattern=r'go_to-.*'))
+    application.add_handler(CallbackQueryHandler(go_to, pattern=r'go_to-.*'))
     application.add_handler(CallbackQueryHandler(get_products, pattern=r'show_products-.*'))
     application.add_handler(CallbackQueryHandler(navigate_product, pattern=r'prev_product|next_product'))
     application.add_handler(CallbackQueryHandler(add_to_cart, pattern=r'add_to_cart-.*'))

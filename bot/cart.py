@@ -1,5 +1,5 @@
-from telegram import Update
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ContextTypes
 
 
 async def add_to_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -40,7 +40,7 @@ async def handle_quantity(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                     item['quantity'] += quantity
                     break
             else:
-                cart.append({'product_id': product['id'], 'quantity': quantity})
+                cart.append({'product_id': product['id'], 'quantity': quantity, 'product': product})
 
             confirmation_message = (
                 f"Adicionado ao carrinho:\n"
@@ -66,7 +66,6 @@ async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     cart = context.user_data.get('cart', [])
 
     if not cart:
-        # Verifica se update.callback_query existe para obter a mensagem correta
         if update.callback_query:
             await update.callback_query.message.reply_text("Seu carrinho está vazio.")
         else:
@@ -79,9 +78,7 @@ async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     for item in cart:
         product_id = item['product_id']
         quantity = item['quantity']
-
-        # Supondo que você tenha uma forma de obter o nome e preço do produto a partir do product_id
-        product = next((p for p in context.user_data.get('products', []) if p['id'] == product_id), None)
+        product = item['product']
 
         if product:
             unit_price = product['price']
@@ -98,8 +95,13 @@ async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     cart_message += f"**Total do carrinho:** R${total_cart_value:.2f}"
 
-    # Enviando a mensagem, dependendo da origem do update
+    reply_keyboard = [
+        [InlineKeyboardButton("🛒 Finalizar pedido", callback_data="c-finishPurchase"),
+         InlineKeyboardButton("📦 Catálogo", callback_data="go_to-catalogue")]
+    ]
+    reply_markup = InlineKeyboardMarkup(reply_keyboard)
+
     if update.callback_query:
-        await update.callback_query.message.reply_text(cart_message, parse_mode='Markdown')
+        await update.callback_query.message.reply_text(cart_message, parse_mode='Markdown', reply_markup=reply_markup)
     else:
-        await update.message.reply_text(cart_message, parse_mode='Markdown')
+        await update.message.reply_text(cart_message, parse_mode='Markdown', reply_markup=reply_markup)

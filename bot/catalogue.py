@@ -17,7 +17,7 @@ async def show_catalogue_categories(query: Update.callback_query, context: Conte
 
     if len(categories_data) > 0:
         keyboard = [
-            [InlineKeyboardButton(category['name'], callback_data=f"show_products-{category['id']}")]
+            [InlineKeyboardButton(f"{category['emoji']} {category['name']}", callback_data=f"show_products-{category['id']}")]
             for category in categories_data
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -67,19 +67,20 @@ async def display_product(query: Update.callback_query, context: ContextTypes.DE
 
     navigation_buttons = []
     if current_index > 0:
-        previous_button = InlineKeyboardButton("Anterior", callback_data=f"prev_product")
+        previous_button = InlineKeyboardButton("⬅️ Anterior", callback_data=f"prev_product")
         navigation_buttons.append(previous_button)
 
     if current_index < len(products) - 1:
-        next_button = InlineKeyboardButton("Próximo", callback_data=f"next_product")
+        next_button = InlineKeyboardButton("Próximo ➡️", callback_data=f"next_product")
         navigation_buttons.append(next_button)
 
-    add_to_cart_button = InlineKeyboardButton("Adicionar ao Carrinho", callback_data=f"add_to_cart-{product['id']}")
+    add_to_cart_button = InlineKeyboardButton("➕ Adicionar ao Carrinho", callback_data=f"add_to_cart-{product['id']}")
+    cart_button = InlineKeyboardButton("🛒 Carrinho", callback_data=f"go_to-cart")
 
     keyboard = []
     if navigation_buttons:
         keyboard.append(navigation_buttons)
-    keyboard.append([add_to_cart_button])
+    keyboard.append([add_to_cart_button, cart_button])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
