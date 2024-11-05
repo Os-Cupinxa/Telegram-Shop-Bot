@@ -17,7 +17,7 @@ def get_category(db: Session, category_id: int):
 
 
 def create_category(db: Session, category: CategoryCreate):
-    db_category = Category(name=category.name)
+    db_category = Category(name=category.name, emoji=category.emoji)
     db.add(db_category)
     db.commit()
     db.refresh(db_category)
@@ -28,6 +28,7 @@ def update_category(db: Session, category_id: int, category: CategoryCreate):
     db_category = get_object_by_id(db, Category, category_id, "Category not found")
 
     db_category.name = category.name
+    db_category.emoji = category.emoji
     db.commit()
     db.refresh(db_category)
     return db_category

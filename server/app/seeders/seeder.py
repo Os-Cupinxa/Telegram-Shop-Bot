@@ -14,6 +14,7 @@ cursor = conn.cursor()
 fake = Faker("pt_BR")
 fake.add_provider(person)
 
+
 def populate_users():
     data = []
     for _ in range(10):
@@ -34,19 +35,19 @@ def populate_users():
 
 def populate_categories():
     data = [
-        ("Frutas",),
-        ("Vegetais",),
-        ("Carnes",),
-        ("Laticínios",),
-        ("Grãos e Cereais",),
-        ("Doces",),
-        ("Bebidas",),
-        ("Pães e Massas",),
-        ("Condimentos",),
-        ("Snacks",),
+        ("Frutas", "🍓"),
+        ("Vegetais", "🥬"),
+        ("Carnes", "🥩"),
+        ("Laticínios", "🥛"),
+        ("Grãos e Cereais", "🌾"),
+        ("Doces", "🍬"),
+        ("Bebidas", "🍹"),
+        ("Pães e Massas", "🍞"),
+        ("Condimentos", "🫙"),
+        ("Lanches", "🍿"),
     ]
 
-    query = "INSERT INTO categories (name) VALUES (%s)"
+    query = "INSERT INTO categories (name, emoji) VALUES (%s, %s)"
 
     try:
         cursor.executemany(query, data)
@@ -158,7 +159,6 @@ populate_products()
 populate_clients()
 populate_orders()
 populate_order_item()
-
 
 cursor.close()
 conn.close()
