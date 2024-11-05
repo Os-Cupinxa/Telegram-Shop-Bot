@@ -15,51 +15,47 @@ async def add_to_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 async def handle_quantity(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if context.user_data.get('awaiting_quantity'):
-        try:
-            quantity = int(update.message.text)
+    try:
+        quantity = int(update.message.text)
 
-            if quantity <= 0:
-                await update.message.reply_text("Por favor, insira uma quantidade válida (maior que 0).")
-                return
+        if quantity <= 0:
+            await update.message.reply_text("Por favor, insira uma quantidade válida (maior que 0).")
+            return
 
-            current_index = context.user_data.get('current_product_index', 0)
-            products = context.user_data.get('products', [])
-            product = products[current_index]
+        current_index = context.user_data.get('current_product_index', 0)
+        products = context.user_data.get('products', [])
+        product = products[current_index]
 
-            unit_price = product['price']
-            total_price = unit_price * quantity
+        unit_price = product['price']
+        total_price = unit_price * quantity
 
-            if 'cart' not in context.user_data:
-                context.user_data['cart'] = []
+        if 'cart' not in context.user_data:
+            context.user_data['cart'] = []
 
-            cart = context.user_data['cart']
+        cart = context.user_data['cart']
 
-            for item in cart:
-                if item['product_id'] == product['id']:
-                    item['quantity'] += quantity
-                    break
-            else:
-                cart.append({'product_id': product['id'], 'quantity': quantity, 'product': product})
+        for item in cart:
+            if item['product_id'] == product['id']:
+                item['quantity'] += quantity
+                break
+        else:
+            cart.append({'product_id': product['id'], 'quantity': quantity, 'product': product})
 
-            confirmation_message = (
-                f"Adicionado ao carrinho:\n"
-                f"**Produto:** {product['name']}\n"
-                f"**Quantidade:** {quantity}\n"
-                f"**Valor unitário:** R${unit_price:.2f}\n"
-                f"**Total:** R${total_price:.2f}"
-            )
-            await update.message.reply_text(confirmation_message, parse_mode='Markdown')
+        confirmation_message = (
+            f"Adicionado ao carrinho:\n"
+            f"**Produto:** {product['name']}\n"
+            f"**Quantidade:** {quantity}\n"
+            f"**Valor unitário:** R${unit_price:.2f}\n"
+            f"**Total:** R${total_price:.2f}"
+        )
+        await update.message.reply_text(confirmation_message, parse_mode='Markdown')
 
-            context.user_data['awaiting_quantity'] = False
+        context.user_data['awaiting_quantity'] = False
 
-            await show_cart(update, context)
+        await show_cart(update, context)
 
-        except ValueError:
-            await update.message.reply_text("Por favor, insira um número válido.")
-
-    else:
-        await update.message.reply_text("Por favor, use o comando para adicionar um produto ao carrinho.")
+    except ValueError:
+        await update.message.reply_text("Por favor, insira um número válido.")
 
 
 async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -95,7 +91,7 @@ async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     cart_message += f"**Total do carrinho:** R${total_cart_value:.2f}"
 
     keyboard = [
-        [InlineKeyboardButton("🛒 Finalizar pedido", callback_data="c-finishPurchase"),
+        [InlineKeyboardButton("🛒 Finalizar pedido", callback_data="go_to-checkout"),
          InlineKeyboardButton("📦 Catálogo", callback_data="go_to-catalogue")],
         [InlineKeyboardButton("❌ Remover item", callback_data="prompt_remove_item")]
     ]

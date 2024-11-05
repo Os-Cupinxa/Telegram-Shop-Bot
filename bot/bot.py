@@ -12,7 +12,7 @@ from telegram.ext import (
 
 from catalogue import *
 from cart import *
-from registering import *
+from checkout import finish_purchase, process_cpf
 
 # Enable logging
 logging.basicConfig(
@@ -44,6 +44,15 @@ async def go_to(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await show_catalogue_categories(query, context)
     elif page == "cart":
         await show_cart(update, context)
+    elif page == "checkout":
+        await finish_purchase(update, context)
+
+
+async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if context.user_data.get('awaiting_cpf', False):
+        await process_cpf(update, context)
+    elif context.user_data.get('awaiting_quantity', False):
+        await handle_quantity(update, context)
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -66,7 +75,7 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(prompt_remove_item, pattern=r'prompt_remove_item'))
     application.add_handler(CallbackQueryHandler(confirm_remove_from_cart, pattern=r'confirm_remove_item-.*'))
 
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_quantity))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_input))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
