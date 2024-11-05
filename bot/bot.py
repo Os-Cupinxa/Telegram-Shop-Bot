@@ -43,7 +43,7 @@ async def after_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     if page == "catalogue":
         await show_catalogue_categories(query, context)
     elif page == "cart":
-        await query.edit_message_text("Você clicou no carrinho!")
+        await show_cart(update, context)
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -57,6 +57,7 @@ def main() -> None:
 
     application.add_handler(CommandHandler("iniciar", start))
     application.add_handler(CommandHandler("cancelar", cancel))
+    application.add_handler(CommandHandler("carrinho", show_cart))
 
     application.add_handler(CallbackQueryHandler(after_start, pattern=r'go_to-.*'))
     application.add_handler(CallbackQueryHandler(get_products, pattern=r'show_products-.*'))
