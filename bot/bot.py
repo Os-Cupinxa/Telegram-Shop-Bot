@@ -1,18 +1,18 @@
 import logging
 
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ReplyKeyboardRemove, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
     CommandHandler,
     ContextTypes,
-    ConversationHandler,
     MessageHandler,
     filters, CallbackQueryHandler,
 )
 
-from catalogue import *
-from cart import *
-from checkout import finish_purchase, process_cpf
+from account import log_in, check_user_by_cpf
+from cart import show_cart, handle_quantity, add_to_cart, prompt_remove_item, confirm_remove_from_cart
+from catalogue import show_catalogue_categories, get_products, navigate_product
+from registering import process_name, process_cpf, process_phone, process_city, process_address
 
 # Enable logging
 logging.basicConfig(
@@ -26,7 +26,8 @@ logger = logging.getLogger(__name__)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     reply_keyboard = [
         [InlineKeyboardButton("🛒 Carrinho", callback_data=f"go_to-cart"),
-         InlineKeyboardButton("📦 Catálogo", callback_data=f"go_to-catalogue")]
+         InlineKeyboardButton("📦 Catálogo", callback_data=f"go_to-catalogue"),
+         InlineKeyboardButton("🙋 Efetuar Login", callback_data=f"go_to-login")]
     ]
 
     await update.message.reply_text(
@@ -44,13 +45,32 @@ async def go_to(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await show_catalogue_categories(query, context)
     elif page == "cart":
         await show_cart(update, context)
+    elif page == "login":
+        await log_in(update, context)
     elif page == "checkout":
-        await finish_purchase(update, context)
+        user_info = context.user_data.get('user_info', {})
+        if not user_info:
+            await log_in(update, context)
+        else:
+            print('TODO CRIAR FINALIZAÇÃO DO PEDIDO')
 
 
 async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if context.user_data.get('awaiting_cpf', False):
-        await process_cpf(update, context)
+    if context.user_data.get('registering_process', False):
+        if context.user_data.get("awaiting_name"):
+            await process_name(update, context)
+        elif context.user_data.get("awaiting_cpf"):
+            await process_cpf(update, context)
+        elif context.user_data.get("awaiting_phone"):
+            await process_phone(update, context)
+        elif context.user_data.get("awaiting_city"):
+            await process_city(update, context)
+        elif context.user_data.get("awaiting_address"):
+            await process_address(update, context)
+
+    elif context.user_data.get('awaiting_cpf', False):
+        await check_user_by_cpf(update, context)
+
     elif context.user_data.get('awaiting_quantity', False):
         await handle_quantity(update, context)
 

@@ -60,19 +60,27 @@ async def handle_quantity(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     cart = context.user_data.get('cart', [])
+    user_info = context.user_data.get('user_info', {})
+
+    cart_message = ""
+
+    if user_info:
+        cart_message += f"{user_info["name"]},\n"
 
     if not cart:
         keyboard = [[InlineKeyboardButton("📦 Catálogo", callback_data="go_to-catalogue")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
+        cart_message += "Seu carrinho está vazio."
+
         if update.callback_query:
-            await update.callback_query.message.reply_text("Seu carrinho está vazio.", reply_markup=reply_markup)
+            await update.callback_query.message.reply_text(cart_message, reply_markup=reply_markup)
         else:
-            await update.message.reply_text("Seu carrinho está vazio.", reply_markup=reply_markup)
+            await update.message.reply_text(cart_message, reply_markup=reply_markup)
         return
 
     total_cart_value = 0
-    cart_message = "Seu carrinho contém:\n"
+    cart_message += "Seu carrinho contém:\n"
 
     for item in cart:
         product = item['product']
