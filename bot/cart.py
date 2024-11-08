@@ -90,13 +90,14 @@ async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         total_cart_value += total_price
 
         cart_message += (
-            f"**Produto:** {product['name']}\n"
-            f"**Quantidade:** {quantity}\n"
-            f"**Valor unitário:** R${unit_price:.2f}\n"
-            f"**Total:** R${total_price:.2f}\n\n"
+            f"🛍️ *Produto:* {product['name']}\n"
+            f"🔢 *Quantidade:* {quantity}\n"
+            f"💵 *Valor unitário:* R${unit_price:.2f}\n"
+            f"💰 *Total:* R${total_price:.2f}\n"
+            f"--------------------------------------------------\n"
         )
 
-    cart_message += f"**Total do carrinho:** R${total_cart_value:.2f}"
+    cart_message += f"🛒 *Total do carrinho:* R${total_cart_value:.2f}"
 
     keyboard = [
         [InlineKeyboardButton("🛒 Finalizar pedido", callback_data="go_to-checkout"),
