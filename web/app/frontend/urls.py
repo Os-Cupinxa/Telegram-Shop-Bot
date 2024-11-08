@@ -22,4 +22,10 @@ urlpatterns = [
     path('categories/add', views.category_add, name='category_add'),
     path('categories/edit/<int:id>/', views.category_edit, name='category_edit'),
     path('categories/delete', views.category_delete, name='category_delete'),
+
+    # Client paths
+    path('clients/', views.clients_list, name='clients_list'),
+    path('clients/edit/<int:id>/', views.client_edit, name='client_edit'),
+    #path('clients/delete', views.client_delete, name='client_delete'),
+
 ]
