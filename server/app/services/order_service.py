@@ -30,6 +30,18 @@ def create_order(db: Session, order: OrderCreate):
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
+
+    for item in order.items:
+        db_order_item = OrderItem(
+            order_id=db_order.id,
+            product_id=item.product_id,
+            quantity=item.quantity
+        )
+        db.add(db_order_item)
+
+    db.commit()
+    db.refresh(db_order)
+
     return db_order
 
 

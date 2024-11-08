@@ -1,5 +1,15 @@
+from typing import List
+
 from pydantic import BaseModel
 from datetime import datetime
+
+
+class OrderItemBase(BaseModel):
+    product_id: int
+    quantity: int
+
+    class Config:
+        orm_mode = True
 
 
 class OrderBase(BaseModel):
@@ -9,12 +19,13 @@ class OrderBase(BaseModel):
 
 
 class OrderCreate(OrderBase):
-    pass
+    items: List[OrderItemBase]
 
 
 class OrderResponse(OrderBase):
     id: int
     created_date: datetime
+    items: List[OrderItemBase]
 
     class Config:
         orm_mode = True
