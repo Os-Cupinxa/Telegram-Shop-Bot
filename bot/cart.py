@@ -145,5 +145,5 @@ async def confirm_remove_from_cart(update: Update, context: ContextTypes.DEFAULT
     cart = [item for item in cart if item['product_id'] != product_id]
     context.user_data['cart'] = cart
 
-    await query.message.reply_text("Item removido do carrinho.")
+    await query.message.reply_text("✔️ Item removido do carrinho.")
     await show_cart(update, context)
