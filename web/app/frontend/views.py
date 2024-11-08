@@ -119,3 +119,39 @@ def product_delete(request):
         messages.success(request, "Product deleted successfully")
         return redirect('products_list')
     return redirect('products_list')
+
+
+# categories views.py
+@login_required
+def categories_list(request):
+    categories = Category.objects.all()
+    return render(request, 'main/categories/all.html', {'categories': categories})
+
+@login_required
+def category_add(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        category = Category(name=name)
+        category.save()
+        return redirect('categories_list')
+
+    return render(request, 'main/categories/add.html')
+
+@login_required
+def category_edit(request, id):
+    category = Category.objects.get(id=id)
+    if request.method == 'POST':
+        category.name = request.POST.get('name')
+        category.save()
+        return redirect('categories_list')
+
+    return render(request, 'main/categories/edit.html', {'category': category})
+
+@login_required
+def category_delete(request):
+    if request.method == 'POST':
+        category_id = request.POST.get('id')
+        category = get_object_or_404(Category, id=category_id)
+        category.delete()
+        return redirect('categories_list')
+    return redirect('categories_list')
