@@ -12,6 +12,7 @@ from telegram.ext import (
 from account import log_in, check_user_by_cpf
 from cart import show_cart, handle_quantity, add_to_cart, prompt_remove_item, confirm_remove_from_cart
 from catalogue import show_catalogue_categories, get_products, navigate_product
+from checkout import checkout
 from registering import process_name, process_cpf, process_phone, process_city, process_address
 
 # Enable logging
@@ -52,7 +53,7 @@ async def go_to(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if not user_info:
             await log_in(update, context)
         else:
-            print('TODO CRIAR FINALIZAÇÃO DO PEDIDO')
+            await checkout(update, context)
 
 
 async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
