@@ -9,7 +9,8 @@ from telegram.ext import (
     filters, CallbackQueryHandler,
 )
 
-from account import log_in, check_user_by_cpf
+from account import log_in, check_user_by_cpf, choose_info_to_edit, show_user_info, update_name, update_phone, \
+    update_city, update_address, edit_name, edit_phone, edit_city, edit_address
 from cart import show_cart, handle_quantity, add_to_cart, prompt_remove_item, confirm_remove_from_cart
 from catalogue import show_catalogue_categories, get_products, navigate_product
 from checkout import checkout
@@ -44,10 +45,31 @@ async def go_to(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if page == "catalogue":
         await show_catalogue_categories(query, context)
+
     elif page == "cart":
         await show_cart(update, context)
+
+    elif page == "profile":
+        await show_user_info(update, context)
+
     elif page == "login":
         await log_in(update, context)
+
+    elif page == "edit_user_info":
+        await choose_info_to_edit(update, context)
+
+    elif page == "edit_name":
+        await edit_name(update, context)
+
+    elif page == "edit_phone":
+        await edit_phone(update, context)
+
+    elif page == "edit_city":
+        await edit_city(update, context)
+
+    elif page == "edit_address":
+        await edit_address(update, context)
+
     elif page == "checkout":
         user_info = context.user_data.get('user_info', {})
         if not user_info:
@@ -68,6 +90,16 @@ async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             await process_city(update, context)
         elif context.user_data.get("awaiting_address"):
             await process_address(update, context)
+
+    if context.user_data.get('update_info_process', False):
+        if context.user_data.get("awaiting_name"):
+            await update_name(update, context)
+        elif context.user_data.get("awaiting_phone"):
+            await update_phone(update, context)
+        elif context.user_data.get("awaiting_city"):
+            await update_city(update, context)
+        elif context.user_data.get("awaiting_address"):
+            await update_address(update, context)
 
     elif context.user_data.get('awaiting_cpf', False):
         await check_user_by_cpf(update, context)
