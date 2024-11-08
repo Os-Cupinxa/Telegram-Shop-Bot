@@ -41,13 +41,13 @@ async def show_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
     cart_message = (
-        f"**Dados do Cliente**\n\n"
-        f"**Nome:** {user_info['name']}\n"
-        f"**CPF:** {user_info['cpf']}\n"
-        f"**Telefone:** {user_info['phone_number']}\n"
-        f"**Cidade:** {user_info['city']}\n"
-        f"**Endereço:** {user_info['address']}\n"
-        f"**Status:** {'Ativo' if user_info['is_active'] else 'Inativo'}\n"
+        f"👤 *Dados do Cliente*\n\n"
+        f"🔠 *Nome:* {user_info['name']}\n"
+        f"🆔 *CPF:* {user_info['cpf']}\n"
+        f"📞 *Telefone:* {user_info['phone_number']}\n"
+        f"🌆 *Cidade:* {user_info['city']}\n"
+        f"🏠 *Endereço:* {user_info['address']}\n"
+        f"🔓 *Status:* {'🟢 Ativo' if user_info['is_active'] else '🔴 Inativo'}\n"
     )
 
     keyboard = [
