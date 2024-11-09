@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from .models import Product, Category  # Assumindo que temos um modelo Product e Category
 from django.contrib import messages
+from .models import Client
 
 
 def login_view(request):
@@ -119,3 +120,89 @@ def product_delete(request):
         messages.success(request, "Product deleted successfully")
         return redirect('products_list')
     return redirect('products_list')
+
+
+# categories views.py
+@login_required
+def categories_list(request):
+    categories = Category.objects.all()
+    return render(request, 'main/categories/all.html', {'categories': categories})
+
+@login_required
+def category_add(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        category = Category(name=name)
+        category.save()
+        return redirect('categories_list')
+
+    return render(request, 'main/categories/add.html')
+
+@login_required
+def category_edit(request, id):
+    category = Category.objects.get(id=id)
+    if request.method == 'POST':
+        category.name = request.POST.get('name')
+        category.save()
+        return redirect('categories_list')
+
+    return render(request, 'main/categories/edit.html', {'category': category})
+
+@login_required
+def category_delete(request):
+    if request.method == 'POST':
+        category_id = request.POST.get('id')
+        category = get_object_or_404(Category, id=category_id)
+        category.delete()
+        return redirect('categories_list')
+    return redirect('categories_list')
+
+# clients views.py
+@login_required
+def clients_list(request):
+    clients = Client.objects.all()
+    return render(request, 'main/clients/all.html', {'clients': clients})
+
+
+@login_required
+def client_edit(request, id):
+    # Carrega o cliente ou retorna 404 se não existir
+    client = get_object_or_404(Client, id=id)
+    
+    if request.method == 'POST':
+        # Obter dados do formulário
+        name = request.POST.get('name')
+        phoneNumber = request.POST.get('phoneNumber')
+        city = request.POST.get('city')
+        address = request.POST.get('address')
+        active = request.POST.get('active') == 'true'
+
+        # Validação simples para os campos obrigatórios
+        errors = {}
+        if not name:
+            errors['nameError'] = "Name is required."
+        if not phoneNumber:
+            errors['phoneNumberError'] = "Phone number is required."
+        if not city:
+            errors['cityError'] = "City is required."
+        if not address:
+            errors['addressError'] = "Address is required."
+
+        if errors:
+            # Exibe os erros no formulário se houver
+            return render(request, 'main/clients/edit.html', {'client': client, **errors})
+
+        # Atualiza os campos do cliente
+        client.name = name
+        client.phoneNumber = phoneNumber
+        client.city = city
+        client.address = address
+        client.active = active
+        client.save()
+
+        # Exibe mensagem de sucesso e redireciona para a lista de clientes (ou outra página)
+        messages.success(request, "Client updated successfully.")
+        return redirect('client_list')  # Substitua por sua URL de lista de clientes
+
+    # Exibe o formulário com os dados atuais do cliente
+    return render(request, 'main/clients/edit.html', {'client': client})
