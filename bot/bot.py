@@ -13,7 +13,7 @@ from account import log_in, check_user_by_cpf, choose_info_to_edit, show_user_in
     update_city, update_address, edit_name, edit_phone, edit_city, edit_address
 from cart import show_cart, handle_quantity, add_to_cart, prompt_remove_item, confirm_remove_from_cart
 from catalogue import show_catalogue_categories, get_products, navigate_product
-from checkout import checkout
+from checkout import checkout, confirm_order
 from registering import process_name, process_cpf, process_phone, process_city, process_address
 
 # Enable logging
@@ -77,6 +77,9 @@ async def go_to(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         else:
             await checkout(update, context)
 
+    elif page == "confirm_checkout":
+        await confirm_order(update, context)
+
 
 async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if context.user_data.get('registering_process', False):
@@ -92,16 +95,16 @@ async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             await process_address(update, context)
 
     if context.user_data.get('update_info_process', False):
-        if context.user_data.get("awaiting_name"):
+        if context.user_data.get("awaiting_name_update"):
             await update_name(update, context)
-        elif context.user_data.get("awaiting_phone"):
+        elif context.user_data.get("awaiting_phone_update"):
             await update_phone(update, context)
-        elif context.user_data.get("awaiting_city"):
+        elif context.user_data.get("awaiting_city_update"):
             await update_city(update, context)
-        elif context.user_data.get("awaiting_address"):
+        elif context.user_data.get("awaiting_address_update"):
             await update_address(update, context)
 
-    elif context.user_data.get('awaiting_cpf', False):
+    elif context.user_data.get('awaiting_cpf_login', False):
         await check_user_by_cpf(update, context)
 
     elif context.user_data.get('awaiting_quantity', False):
