@@ -5,49 +5,43 @@ from telegram.ext import ContextTypes
 
 async def start_registration(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     registration_message = (
-        "*Você ainda não possui uma conta.*\n\n"
-        "*Vamos iniciar o seu cadastro! Por favor, informe seu nome.*"
+        f"*Você ainda não possui uma conta.*\n\n"
+        f"Vamos iniciar o seu cadastro! Por favor, *informe seu nome:*"
     )
 
-    await update.message.reply_text(registration_message)
+    context.user_data["update_info_process"] = False
     context.user_data["registering_process"] = True
     context.user_data["awaiting_name"] = True
     context.user_data["new_user"] = {}
+    await update.message.reply_text(registration_message, parse_mode='Markdown')
 
 
 async def process_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data["new_user"]["name"] = update.message.text
     context.user_data["awaiting_name"] = False
     context.user_data["awaiting_cpf"] = True
-    await update.message.reply_text("Ótimo! Agora, informe seu CPF.")
+    await update.message.reply_text("Ótimo! Agora, *informe seu CPF:*", parse_mode='Markdown')
 
 
 async def process_cpf(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data["new_user"]["cpf"] = update.message.text
     context.user_data["awaiting_cpf"] = False
     context.user_data["awaiting_phone"] = True
-
-    phone_button = KeyboardButton("Enviar meu número de telefone", request_contact=True)
-    reply_markup = ReplyKeyboardMarkup([[phone_button]], one_time_keyboard=True)
-    await update.message.reply_text("Por favor, compartilhe seu número de telefone.", reply_markup=reply_markup)
+    await update.message.reply_text("Por favor, compartilhe *seu número de telefone:*", parse_mode='Markdown')
 
 
 async def process_phone(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.contact:
-        context.user_data["new_user"]["phone_number"] = update.message.contact.phone_number
-    else:
-        context.user_data["new_user"]["phone_number"] = update.message.text
-
+    context.user_data["new_user"]["phone_number"] = update.message.text
     context.user_data["awaiting_phone"] = False
     context.user_data["awaiting_city"] = True
-    await update.message.reply_text("Quase lá! Agora, informe sua cidade.")
+    await update.message.reply_text("Quase lá! Agora, *informe sua cidade:*", parse_mode='Markdown')
 
 
 async def process_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data["new_user"]["city"] = update.message.text
     context.user_data["awaiting_city"] = False
     context.user_data["awaiting_address"] = True
-    await update.message.reply_text("Por último, informe seu endereço.")
+    await update.message.reply_text("Por último, *informe seu endereço.*", parse_mode='Markdown')
 
 
 async def process_address(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
