@@ -11,14 +11,14 @@ async def log_in(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     await query.message.reply_text("Por favor, digite seu CPF para finalizar o pedido:")
 
-    context.user_data['awaiting_cpf'] = True
+    context.user_data['awaiting_cpf_login'] = True
 
 
 async def check_user_by_cpf(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     raw_cpf = update.message.text
     cpf = re.sub(r'[.-]', '', raw_cpf)
 
-    context.user_data['awaiting_cpf'] = False
+    context.user_data['awaiting_cpf_login'] = False
 
     url = f"http://127.0.0.1:8001/clients/cpf/{cpf}"
 
@@ -80,28 +80,28 @@ async def choose_info_to_edit(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def edit_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data["update_info_process"] = True
-    context.user_data["awaiting_name"] = True
+    context.user_data["awaiting_name_update"] = True
     await update.callback_query.answer()
     await update.callback_query.message.reply_text("Digite seu novo nome:")
 
 
 async def edit_phone(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data["update_info_process"] = True
-    context.user_data["awaiting_phone"] = True
+    context.user_data["awaiting_phone_update"] = True
     await update.callback_query.answer()
     await update.callback_query.message.reply_text("Digite seu novo telefone:")
 
 
 async def edit_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data["update_info_process"] = True
-    context.user_data["awaiting_city"] = True
+    context.user_data["awaiting_city_update"] = True
     await update.callback_query.answer()
     await update.callback_query.message.reply_text("Digite sua nova cidade:")
 
 
 async def edit_address(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data["update_info_process"] = True
-    context.user_data["awaiting_address"] = True
+    context.user_data["awaiting_address_update"] = True
     await update.callback_query.answer()
     await update.callback_query.message.reply_text("Digite seu novo endereço:")
 
@@ -112,7 +112,7 @@ async def update_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     user_info['name'] = new_name
     context.user_data['user_info'] = user_info
 
-    context.user_data['awaiting_name'] = False
+    context.user_data['awaiting_name_update'] = False
     await update.message.reply_text(f"✔️ Nome atualizado para {new_name}.")
     await update_user_in_database(update, context)
 
@@ -123,7 +123,7 @@ async def update_phone(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     user_info['phone_number'] = new_phone
     context.user_data['user_info'] = user_info
 
-    context.user_data['awaiting_phone_number'] = False
+    context.user_data['awaiting_phone_update'] = False
     await update.message.reply_text(f"✔️ Telefone atualizado para {new_phone}.")
     await update_user_in_database(update, context)
 
@@ -134,7 +134,7 @@ async def update_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     user_info['city'] = new_city
     context.user_data['user_info'] = user_info
 
-    context.user_data['awaiting_city'] = False
+    context.user_data['awaiting_city_update'] = False
     await update.message.reply_text(f"✔️ Cidade atualizada para {new_city}.")
     await update_user_in_database(update, context)
 
@@ -145,7 +145,7 @@ async def update_address(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_info['address'] = new_address
     context.user_data['user_info'] = user_info
 
-    context.user_data['awaiting_address'] = False
+    context.user_data['awaiting_address_update'] = False
     await update.message.reply_text(f"✔️ Endereço atualizado para {new_address}.")
     await update_user_in_database(update, context)
 
