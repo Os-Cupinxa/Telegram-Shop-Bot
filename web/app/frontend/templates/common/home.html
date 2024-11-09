@@ -17,7 +17,7 @@
 </head>
 
 <body class="bg-info">
-    {% if isLoggedIn %}
+    {% if user.is_authenticated %}
     {% include 'common/navbar.html' %}
     {% endif %}
 

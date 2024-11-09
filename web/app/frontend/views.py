@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Product, Category  # Assumindo que temos um modelo Product e Category
 from django.contrib import messages
 from .models import Client
-
+from .models import Order
 
 def login_view(request):
     if request.method == 'POST':
@@ -24,6 +24,9 @@ def login_view(request):
         else:
             return HttpResponseRedirect('/?error=true')  # Redireciona com erro
 
+    return render(request, 'login.html')
+
+def logout_view(request):
     return render(request, 'login.html')
 
 @login_required
@@ -206,3 +209,49 @@ def client_edit(request, id):
 
     # Exibe o formulário com os dados atuais do cliente
     return render(request, 'main/clients/edit.html', {'client': client})
+
+# broadcast views.py7
+#@login_required
+#def broadcast(request):
+#    return render(request, 'main/broadcasts/add.html')
+
+# order views.py
+@login_required
+def orders_list(request):
+    orders = Order.objects.all()
+    return render(request, 'main/orders/all.html', {'orders': orders})
+
+@login_required
+def order_add(request):
+    if request.method == 'POST':
+        client_id = request.POST.get('client')
+        client = get_object_or_404(Client, id=client_id)
+        amount = request.POST.get('amount')
+        order = Order(client=client, amount=amount)
+        order.save()
+        return redirect('orders_list')
+
+    clients = Client.objects.all()
+    return render(request, 'main/orders/add.html', {'clients': clients})
+
+@login_required
+def order_edit(request, id):
+    order = get_object_or_404(Order, id=id)
+    if request.method == 'POST':
+        client_id = request.POST.get('client')
+        order.client = get_object_or_404(Client, id=client_id)
+        order.amount = request.POST.get('amount')
+        order.save()
+        return redirect('orders_list')
+
+    clients = Client.objects.all()
+    return render(request, 'main/orders/edit.html', {'order': order, 'clients': clients})
+
+@login_required
+def order_delete(request):
+    if request.method == 'POST':
+        order_id = request.POST.get('id')
+        order = get_object_or_404(Order, id=order_id)
+        order.delete()
+        return redirect('orders_list')
+    return redirect('orders_list')

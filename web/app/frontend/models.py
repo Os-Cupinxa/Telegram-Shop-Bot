@@ -28,3 +28,30 @@ class Client(models.Model):
     
     def __str__(self):
         return self.name
+    
+class OrderStatus(models.Model):
+    id = models.AutoField(primary_key=True)
+    value = models.CharField(max_length=255)
+    
+    def __str__(self):
+        return self.name
+
+class Order(models.Model):
+    id = models.AutoField(primary_key=True)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    localDateTime = models.DateTimeField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    def __str__(self):
+        return self.client.name
+
+class OrderItem(models.Model):
+    id = models.AutoField(primary_key=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    productName = models.CharField(max_length=255)
+    productPrice = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    def __str__(self):
+        return self.productName

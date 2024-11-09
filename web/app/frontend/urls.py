@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('', views.login_view, name='login'),
     path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
     
     # User paths
     path('users/', views.users_list, name='users_list'),
@@ -27,5 +28,15 @@ urlpatterns = [
     path('clients/', views.clients_list, name='clients_list'),
     path('clients/edit/<int:id>/', views.client_edit, name='client_edit'),
     #path('clients/delete', views.client_delete, name='client_delete'),
+
+    # Broadcast paths
+    #path('broadcast/', views.broadcast, name='broadcast'),
+    #path('broadcast/send', views.broadcast_send, name='broadcast_add'),
+
+    # Order paths
+    path('orders/', views.orders_list, name='orders_list'),
+    path('orders/add', views.order_add, name='order_add'),
+    path('orders/edit/<int:id>/', views.order_edit, name='order_edit'),
+    path('orders/delete', views.order_delete, name='order_delete'),
 
 ]
