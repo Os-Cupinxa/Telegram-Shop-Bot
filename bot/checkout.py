@@ -34,7 +34,7 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     order_data = {
         "client_id": user_info['id'],
         "status": "pending",
-        "amount": 1,
+        "amount": 1, # TODO mudar para ser float e enviar total do pedido (produtos * quantidades)
         "items": cart_items
     }
 

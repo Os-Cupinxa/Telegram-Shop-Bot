@@ -54,7 +54,7 @@ async def show_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         [InlineKeyboardButton("🛒 Carrinho", callback_data="go_to-cart"),
          InlineKeyboardButton("📦 Catálogo", callback_data="go_to-catalogue")],
         [InlineKeyboardButton("🖊️ Editar Dados", callback_data="go_to-edit_user_info"),
-         InlineKeyboardButton("🗂️️ Pedidos", callback_data="go_to-orders")]
+         InlineKeyboardButton("🗂️️ Pedidos", callback_data="go_to-orders")] # TODO adicionar função para ver histórico de pedidos
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
