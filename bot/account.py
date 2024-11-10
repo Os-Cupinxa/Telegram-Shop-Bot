@@ -20,7 +20,6 @@ async def check_user_by_cpf(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     raw_cpf = update.message.text
     cpf = re.sub(r'[.-]', '', raw_cpf)
 
-
     if not is_cpf_valid(cpf):
         await update.message.reply_text("❌ CPF inválido! Por favor informe um CPF válido:", parse_mode='Markdown')
         return
@@ -38,7 +37,7 @@ async def check_user_by_cpf(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
         is_checking_out = context.user_data.get('is_checking_out', {})
         if is_checking_out:
-            from checkout import  checkout
+            from checkout import checkout
             await checkout(update, context)
         else:
             await show_user_info(update, context)
@@ -53,6 +52,12 @@ async def show_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_info = context.user_data.get('user_info', {})
 
     if not user_info:
+        reply_keyboard = [InlineKeyboardButton("🙋 Efetuar Login", callback_data=f"go_to-login")]
+
+        await update.message.reply_text(
+            "Você não está logado!",
+            reply_markup=InlineKeyboardMarkup([reply_keyboard])
+        )
         return
 
     cart_message = (
@@ -204,6 +209,7 @@ async def update_user_in_database(update: Update, context: ContextTypes.DEFAULT_
                 context.user_data['user_info'] = response.json()
                 await show_user_info(update, context)
             else:
-                await update.message.reply_text(f"❌ Não foi possível salvar seus dados. Código de erro: {response.status_code}")
+                await update.message.reply_text(
+                    f"❌ Não foi possível salvar seus dados. Código de erro: {response.status_code}")
         except httpx.RequestError as e:
             await update.message.reply_text(f"❌ Erro ao tentar se comunicar com o servidor: {str(e)}")
