@@ -31,10 +31,12 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     cart_items = [{'product_id': item['product_id'], 'quantity': item['quantity']} for item in cart]
 
+    total_amount = sum(item['product']['price'] * item['quantity'] for item in cart)
+
     order_data = {
         "client_id": user_info['id'],
         "status": "pending",
-        "amount": 1, # TODO mudar para ser float e enviar total do pedido (produtos * quantidades)
+        "amount": round(total_amount, 2),
         "items": cart_items
     }
 
