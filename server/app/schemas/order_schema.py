@@ -15,7 +15,7 @@ class OrderItemBase(BaseModel):
 class OrderBase(BaseModel):
     client_id: int
     status: str
-    amount: int
+    amount: float
 
 
 class OrderCreate(OrderBase):
@@ -25,7 +25,6 @@ class OrderCreate(OrderBase):
 class OrderResponse(OrderBase):
     id: int
     created_date: datetime
-    items: List[OrderItemBase]
 
     class Config:
         orm_mode = True
