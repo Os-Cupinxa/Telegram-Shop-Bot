@@ -31,6 +31,8 @@ async def check_user_by_cpf(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         await show_user_info(update, context)
     else:
         from registering import start_registration
+        context.user_data["new_user"] = {}
+        context.user_data["new_user"]["cpf"] = cpf
         await start_registration(update, context)
 
 
