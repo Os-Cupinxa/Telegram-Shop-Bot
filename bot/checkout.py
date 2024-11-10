@@ -42,7 +42,6 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     async with httpx.AsyncClient() as client:
         response = await client.post("http://127.0.0.1:8001/orders/", json=order_data)
-        # TODO o retorno está dando erro no servidor
 
     if response.status_code == 200:
         context.user_data['cart'] = []
