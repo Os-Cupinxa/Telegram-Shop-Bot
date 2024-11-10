@@ -12,20 +12,12 @@ async def start_registration(update: Update, context: ContextTypes.DEFAULT_TYPE)
     context.user_data["update_info_process"] = False
     context.user_data["registering_process"] = True
     context.user_data["awaiting_name"] = True
-    context.user_data["new_user"] = {}
     await update.message.reply_text(registration_message, parse_mode='Markdown')
 
 
 async def process_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data["new_user"]["name"] = update.message.text
     context.user_data["awaiting_name"] = False
-    context.user_data["awaiting_cpf"] = True
-    await update.message.reply_text("Ótimo! Agora, *informe seu CPF:*", parse_mode='Markdown')
-
-
-async def process_cpf(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    context.user_data["new_user"]["cpf"] = update.message.text
-    context.user_data["awaiting_cpf"] = False
     context.user_data["awaiting_phone"] = True
     await update.message.reply_text("Por favor, compartilhe *seu número de telefone:*", parse_mode='Markdown')
 
@@ -68,3 +60,5 @@ async def process_address(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await show_user_info(update, context)
     else:
         await update.message.reply_text("Houve um problema ao registrar o cadastro. Tente novamente mais tarde.")
+
+    context.user_data["new_user"] = {}
