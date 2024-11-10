@@ -1,7 +1,7 @@
 import re
 
 import httpx
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from utils import is_cpf_valid
@@ -98,7 +98,14 @@ async def edit_phone(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     context.user_data["update_info_process"] = True
     context.user_data["awaiting_phone_update"] = True
     await update.callback_query.answer()
-    await update.callback_query.message.reply_text("Digite seu novo telefone:")
+    contact_button = KeyboardButton("Compartilhar meu número de telefone", request_contact=True)
+    reply_markup = ReplyKeyboardMarkup([[contact_button]], one_time_keyboard=True, resize_keyboard=True)
+
+    await update.callback_query.message.reply_text(
+        "Por favor, compartilhe *seu número de telefone:*",
+        parse_mode='Markdown',
+        reply_markup=reply_markup
+    )
 
 
 async def edit_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -127,7 +134,11 @@ async def update_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 async def update_phone(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    new_phone = update.message.text
+    if update.message.contact:
+        new_phone = update.message.contact.phone_number
+    else:
+        new_phone = update.message.text
+
     user_info = context.user_data.get('user_info', {})
     user_info['phone_number'] = new_phone
     context.user_data['user_info'] = user_info

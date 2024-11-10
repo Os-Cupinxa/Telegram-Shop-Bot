@@ -1,3 +1,5 @@
+import re
+
 import httpx
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
@@ -16,14 +18,33 @@ async def start_registration(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def process_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    context.user_data["new_user"]["name"] = update.message.text
+    name = update.message.text
+
+    if re.search(r'\d', name):
+        await update.message.reply_text("O nome não deve conter números. Por favor, insira um nome válido.")
+        return
+
+    context.user_data["new_user"]["name"] = name
     context.user_data["awaiting_name"] = False
     context.user_data["awaiting_phone"] = True
-    await update.message.reply_text("Por favor, compartilhe *seu número de telefone:*", parse_mode='Markdown')
+
+    contact_button = KeyboardButton("Compartilhar meu número de telefone", request_contact=True)
+    reply_markup = ReplyKeyboardMarkup([[contact_button]], one_time_keyboard=True, resize_keyboard=True)
+
+    await update.message.reply_text(
+        "Por favor, compartilhe *seu número de telefone:*",
+        parse_mode='Markdown',
+        reply_markup=reply_markup
+    )
 
 
 async def process_phone(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    context.user_data["new_user"]["phone_number"] = update.message.text
+    if update.message.contact:
+        phone_number = update.message.contact.phone_number
+    else:
+        phone_number = update.message.text
+
+    context.user_data["new_user"]["phone_number"] = phone_number
     context.user_data["awaiting_phone"] = False
     context.user_data["awaiting_city"] = True
     await update.message.reply_text("Quase lá! Agora, *informe sua cidade:*", parse_mode='Markdown')

@@ -135,7 +135,7 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(prompt_remove_item, pattern=r'prompt_remove_item'))
     application.add_handler(CallbackQueryHandler(confirm_remove_from_cart, pattern=r'confirm_remove_item-.*'))
 
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_input))
+    application.add_handler(MessageHandler((filters.TEXT | filters.CONTACT) & ~filters.COMMAND, handle_input))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
