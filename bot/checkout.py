@@ -40,13 +40,13 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         "items": cart_items
     }
 
-    print(order_data)
-
     async with httpx.AsyncClient() as client:
         response = await client.post("http://127.0.0.1:8001/orders/", json=order_data)
         # TODO o retorno está dando erro no servidor
 
     if response.status_code == 200:
+        context.user_data['cart'] = []
+
         order_response = response.json()
         formated_date = format_date(order_response['created_date'])
 
@@ -58,10 +58,7 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             f"📦 *Status*: {order_response['status']}\n\n"
         )
 
-        if update.callback_query:
-            await update.callback_query.message.reply_text(message, parse_mode='Markdown')
-        else:
-            await update.message.reply_text(message, parse_mode="Markdown")
+        await query.edit_message_text(message, parse_mode='Markdown')
     else:
         print(response.status_code)
         print(response.text)
@@ -70,7 +67,4 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             f"Por favor, tente novamente mais tarde!\n"
         )
 
-        if update.callback_query:
-            await update.callback_query.message.reply_text(error_message, parse_mode='Markdown')
-        else:
-            await update.message.reply_text(error_message, parse_mode="Markdown")
+        await query.edit_message_text(error_message, parse_mode='Markdown')
