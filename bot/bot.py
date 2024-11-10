@@ -33,8 +33,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
          InlineKeyboardButton("🙋 Efetuar Login", callback_data=f"go_to-login")]
     ]
 
+    start_text = (
+        "Olá! Seja bem-vindo à loja. Como posso ajudar?\n"
+        "Digite /ajuda para exibir a lista de comandos \n"
+        "ou selecione uma das opções abaixo\n"
+    )
+
     await update.message.reply_text(
-        "Olá! Seja bem-vindo à loja. Como posso ajudar?",
+        start_text,
+        parse_mode='Markdown',
         reply_markup=InlineKeyboardMarkup(reply_keyboard)
     )
 
@@ -115,6 +122,7 @@ async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data.clear()
     await update.message.reply_text(
         "Até mais!", reply_markup=ReplyKeyboardRemove()
     )
@@ -124,7 +132,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     help_text = (
         "📋 *Lista de Comandos Disponíveis:*\n\n"
         "🔹 /iniciar - Iniciar a conversa\n"
-        "🔹 /cancelar - Cancelar a operação atual\n"
+        "🔹 /cancelar - Cancelar a conversa\n"
         "🔹 /carrinho - Ver seu carrinho de compras\n"
         "🔹 /conta - Ver informações da sua conta\n"
         "🔹 /ajuda - Mostrar esta lista de comandos\n"
