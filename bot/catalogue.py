@@ -67,11 +67,11 @@ async def display_product(query: Update.callback_query, context: ContextTypes.DE
 
     navigation_buttons = []
     if current_index > 0:
-        previous_button = InlineKeyboardButton("⬅️ Anterior", callback_data=f"prev_product")
+        previous_button = InlineKeyboardButton("⬅️ Produto Anterior", callback_data=f"prev_product")
         navigation_buttons.append(previous_button)
 
     if current_index < len(products) - 1:
-        next_button = InlineKeyboardButton("Próximo ➡️", callback_data=f"next_product")
+        next_button = InlineKeyboardButton("Próximo Produto ➡️", callback_data=f"next_product")
         navigation_buttons.append(next_button)
 
     add_to_cart_button = InlineKeyboardButton("➕ Adicionar ao Carrinho", callback_data=f"add_to_cart-{product['id']}")
@@ -91,7 +91,6 @@ async def navigate_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     query = update.callback_query
     await query.answer()
 
-    products = context.user_data.get('products', [])
     current_index = context.user_data.get('current_product_index', 0)
 
     if "prev_product" in query.data:
@@ -101,4 +100,5 @@ async def navigate_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     context.user_data['current_product_index'] = current_index
 
+    await display_product(update.callback_query, context)
     await display_product(query, context)
