@@ -9,8 +9,14 @@ from utils import format_date
 
 async def checkout(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data['is_checking_out'] = False
+    user_info = context.user_data.get('user_info', {})
 
-    order_message = (
+    order_message = ""
+
+    if user_info:
+        order_message += f"{user_info["name"]},\n"
+
+    order_message += (
         f" *Deseja confirmar o pedido?*\n"
     )
 
