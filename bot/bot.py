@@ -126,6 +126,7 @@ def main() -> None:
     application.add_handler(CommandHandler("iniciar", start))
     application.add_handler(CommandHandler("cancelar", cancel))
     application.add_handler(CommandHandler("carrinho", show_cart))
+    application.add_handler(CommandHandler("conta", show_user_info))
 
     application.add_handler(CallbackQueryHandler(go_to, pattern=r'go_to-.*'))
     application.add_handler(CallbackQueryHandler(get_products, pattern=r'show_products-.*'))
