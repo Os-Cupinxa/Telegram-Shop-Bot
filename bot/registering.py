@@ -68,5 +68,3 @@ async def process_address(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await show_user_info(update, context)
     else:
         await update.message.reply_text("Houve um problema ao registrar o cadastro. Tente novamente mais tarde.")
-
-    context.user_data.clear()
