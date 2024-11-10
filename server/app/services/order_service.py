@@ -18,6 +18,12 @@ def get_order(db: Session, order_id: int):
     return db_order
 
 
+def get_order_by_client(db: Session, client_id: int):
+    orders = db.query(Order).filter(Order.client_id == client_id).all()
+
+    return orders
+
+
 def create_order(db: Session, order: OrderCreate):
     get_object_by_id(db, Client, order.client_id, "Client not found")
 

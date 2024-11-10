@@ -12,6 +12,7 @@ router = APIRouter()
 def read_clients(db: Session = Depends(get_db)):
     return client_service.get_all_clients(db)
 
+
 @router.get("/clients/cpf/{cpf}", response_model=ClientResponse, tags=["Clients"])
 def read_client_by_cpf(cpf: str, db: Session = Depends(get_db)):
     client = client_service.get_client_by_cpf(db, cpf)
