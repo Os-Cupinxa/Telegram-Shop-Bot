@@ -2,6 +2,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 import httpx
 
+from account import show_user_info
+from cart import show_cart
 from utils import format_date
 
 
@@ -58,6 +60,7 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         )
 
         await query.edit_message_text(message, parse_mode='Markdown')
+        await show_user_info(update, context)
     else:
         print(response.status_code)
         print(response.text)
@@ -67,3 +70,4 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         )
 
         await query.edit_message_text(error_message, parse_mode='Markdown')
+        await show_user_info(update, context)
