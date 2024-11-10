@@ -120,6 +120,20 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    help_text = (
+        "📋 *Lista de Comandos Disponíveis:*\n\n"
+        "🔹 /iniciar - Iniciar a conversa\n"
+        "🔹 /cancelar - Cancelar a operação atual\n"
+        "🔹 /carrinho - Ver seu carrinho de compras\n"
+        "🔹 /conta - Ver informações da sua conta\n"
+        "🔹 /ajuda - Mostrar esta lista de comandos\n"
+        "\n💬 *Se precisar de ajuda adicional, estou à disposição!*"
+    )
+
+    await update.message.reply_text(help_text, parse_mode='Markdown')
+
+
 def main() -> None:
     application = Application.builder().token("8007696885:AAEAB7ezULO2X2sAYGN23KbweAowb9XtsM8").build()
 
@@ -127,6 +141,7 @@ def main() -> None:
     application.add_handler(CommandHandler("cancelar", cancel))
     application.add_handler(CommandHandler("carrinho", show_cart))
     application.add_handler(CommandHandler("conta", show_user_info))
+    application.add_handler(CommandHandler("ajuda", help_command))
 
     application.add_handler(CallbackQueryHandler(go_to, pattern=r'go_to-.*'))
     application.add_handler(CallbackQueryHandler(get_products, pattern=r'show_products-.*'))
