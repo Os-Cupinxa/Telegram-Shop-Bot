@@ -65,7 +65,7 @@ async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     cart_message = ""
 
     if user_info:
-        cart_message += f"{user_info["name"]},\n"
+        cart_message += f"{user_info['name']},\n"
 
     if not cart:
         keyboard = [[InlineKeyboardButton("📦 Catálogo", callback_data="go_to-catalogue")]]
