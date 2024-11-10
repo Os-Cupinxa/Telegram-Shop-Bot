@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.schemas.order_schema import OrderCreate, OrderResponse
+from app.schemas.order_schema import OrderCreate, OrderResponse, OrderItemBase, OrderItemResponse
 from app.services import order_service
 from app.config.database import get_db
 
@@ -16,6 +16,11 @@ def read_orders(db: Session = Depends(get_db)):
 @router.get("/orders/client/{client_id}", response_model=List[OrderResponse], tags=["Orders"])
 def read_orders_by_client(client_id: int, db: Session = Depends(get_db)):
     return order_service.get_order_by_client(db, client_id)
+
+
+@router.get("/orders/items/{order_id}", response_model=List[OrderItemResponse], tags=["Orders"])
+def read_items_by_order(order_id: int, db: Session = Depends(get_db)):
+    return order_service.get_items_by_order(db, order_id)
 
 
 @router.get("/orders/{order_id}", response_model=OrderResponse, tags=["Orders"])

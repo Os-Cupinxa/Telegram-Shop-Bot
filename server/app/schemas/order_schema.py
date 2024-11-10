@@ -3,6 +3,8 @@ from typing import List
 from pydantic import BaseModel
 from datetime import datetime
 
+from app.schemas.product_schema import ProductResponse
+
 
 class OrderItemBase(BaseModel):
     product_id: int
@@ -10,6 +12,12 @@ class OrderItemBase(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class OrderItemResponse(BaseModel):
+    item_id: int
+    quantity: int
+    product: ProductResponse
 
 
 class OrderBase(BaseModel):
