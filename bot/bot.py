@@ -15,7 +15,7 @@ from cart import show_cart, handle_quantity, add_to_cart, prompt_remove_item, co
 from catalogue import show_catalogue_categories, get_products, navigate_product
 from checkout import checkout, confirm_order
 from orders import get_orders, navigate_order, get_order_details
-from registering import process_name, process_cpf, process_phone, process_city, process_address
+from registering import process_name, process_phone, process_city, process_address
 
 # Enable logging
 logging.basicConfig(
@@ -89,8 +89,6 @@ async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     if context.user_data.get('registering_process', False):
         if context.user_data.get("awaiting_name"):
             await process_name(update, context)
-        elif context.user_data.get("awaiting_cpf"):
-            await process_cpf(update, context)
         elif context.user_data.get("awaiting_phone"):
             await process_phone(update, context)
         elif context.user_data.get("awaiting_city"):
