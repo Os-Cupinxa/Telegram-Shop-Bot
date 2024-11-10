@@ -76,6 +76,7 @@ async def go_to(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     elif page == "checkout":
         user_info = context.user_data.get('user_info', {})
+        context.user_data['is_checking_out'] = True
         if not user_info:
             await log_in(update, context)
         else:

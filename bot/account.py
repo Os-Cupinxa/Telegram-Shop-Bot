@@ -35,7 +35,13 @@ async def check_user_by_cpf(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     if response.status_code == 200:
         client_data = response.json()
         context.user_data['user_info'] = client_data
-        await show_user_info(update, context)
+
+        is_checking_out = context.user_data.get('is_checking_out', {})
+        if is_checking_out:
+            from checkout import  checkout
+            await checkout(update, context)
+        else:
+            await show_user_info(update, context)
     else:
         from registering import start_registration
         context.user_data["new_user"] = {}
