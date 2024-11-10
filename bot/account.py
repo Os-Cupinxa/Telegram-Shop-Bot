@@ -4,12 +4,14 @@ import httpx
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
+from utils import is_cpf_valid
+
 
 async def log_in(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
 
-    await query.message.reply_text("Por favor, digite seu CPF para finalizar o pedido:")
+    await query.message.reply_text("Por favor, digite seu CPF:")
 
     context.user_data['awaiting_cpf_login'] = True
 
@@ -17,6 +19,11 @@ async def log_in(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def check_user_by_cpf(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     raw_cpf = update.message.text
     cpf = re.sub(r'[.-]', '', raw_cpf)
+
+
+    if not is_cpf_valid(cpf):
+        await update.message.reply_text("❌ CPF inválido! Por favor informe um CPF válido:", parse_mode='Markdown')
+        return
 
     context.user_data['awaiting_cpf_login'] = False
 
