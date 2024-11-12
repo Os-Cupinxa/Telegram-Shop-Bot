@@ -16,6 +16,16 @@ class Product(models.Model):
     
     def __str__(self):
         return self.name
+    
+class Message(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    text = models.TextField(max_length=4096)
+        
+def __str__(self):
+    return self.name
+
 
 class Client(models.Model):
     id = models.AutoField(primary_key=True)

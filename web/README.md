@@ -25,3 +25,4 @@ streamlit run app/main.py
 
 ## Link do website local:
 
+python manage.py createsuperuser  #para criar usuario
