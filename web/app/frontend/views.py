@@ -46,8 +46,9 @@ def users_add(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        email = request.POST.get('email')
-        user = User.objects.create_user(username, email, password)
+        name = request.POST.get('name')
+        role = request.POST.get('role')
+        user = User.objects.create_user(username, name, password, role)
         user.save()
         return redirect('users_list')
 
@@ -59,6 +60,9 @@ def users_edit(request, id):
     if request.method == 'POST':
         user.username = request.POST.get('username')
         user.email = request.POST.get('email')
+        user.set_password(request.POST.get('password'))
+        user.name = request.POST.get('name')
+        user.role = request.POST.get('role')
         user.save()
         return redirect('users_list')
 
