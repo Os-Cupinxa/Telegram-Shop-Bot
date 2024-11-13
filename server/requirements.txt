@@ -1,6 +1,9 @@
 fastapi
 uvicorn
 sqlalchemy
+passlib
+python-jose
+bcrypt
 pydantic
 mysql-connector-python
 faker

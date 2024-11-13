@@ -153,7 +153,7 @@ def populate_order_item():
         conn.rollback()
 
 
-populate_users()
+# populate_users()
 populate_categories()
 populate_products()
 populate_clients()

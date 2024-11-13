@@ -5,11 +5,14 @@ from app.controllers import (user_controller,
                              product_controller,
                              order_controller,
                              client_controller,
-                             message_controller)
+                             message_controller, auth_controller)
 
 Base.metadata.create_all(bind=engine)
 
 tags_metadata = [
+    {
+        "name": "Auth"
+    },
     {
         "name": "Users"
     },
@@ -36,6 +39,7 @@ app = FastAPI(
     openapi_tags=tags_metadata
 )
 
+app.include_router(auth_controller.router)
 app.include_router(user_controller.router)
 app.include_router(category_controller.router)
 app.include_router(product_controller.router)
