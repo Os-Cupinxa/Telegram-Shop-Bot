@@ -14,7 +14,7 @@ async def checkout(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     order_message = ""
 
     if user_info:
-        order_message += f"{user_info["name"]},\n"
+        order_message += f"{user_info['name']},\n"
 
     order_message += (
         f" *Deseja confirmar o pedido?*\n"
