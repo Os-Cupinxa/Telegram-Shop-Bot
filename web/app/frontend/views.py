@@ -14,9 +14,11 @@ from django.contrib import messages
 from .models import Client
 from .models import Order
 from .models import Message
+from django.http import HttpResponse
 
+import httpx
 
-
+url = "http://localhost:8001/"
 
 def login_view(request):
     if request.method == 'POST':
@@ -82,28 +84,35 @@ def users_delete(request):
 
 
 @login_required
-def products_list(request):
-    products = Product.objects.all()
+async def products_list(request):
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url+"products/")
+    if response.status_code == 200:
+        products = response.json()
     return render(request, 'main/products/all.html', {'products': products})
 
 @login_required
 @csrf_exempt
-def product_add(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description')
-        category_id = request.POST.get('category')
-        price = request.POST.get('price')
-        category = get_object_or_404(Category, id=category_id)
-        photoUrl = request.POST.get('photo')
+async def product_add(request):
+    if request.method == "POST":
+        product = request.POST
+        dataProduct = {
+            "category_id": 1,
+            "photo_url": product.get('photo'),
+            "name": product.get('name'),
+            "description": product.get('description'),
+            "price": product.get('price')
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url + "products/", json=dataProduct)
 
-        product = Product(name=name, description=description, category=category, price=price, photoUrl=photoUrl)
-        product.save()
-        return redirect('products_list')
-
-    categories = Category.objects.all()
-    return render(request, 'main/products/add.html', {'categories': categories})
-
+        if response.status_code == 200:
+            return redirect('products_list')
+        else:
+            return HttpResponse("Erro ao adicionar produto", status=response.status_code)
+    return render(request, 'main/products/add.html')    
+    
 @login_required
 @csrf_exempt
 def product_edit(request, id):
@@ -138,17 +147,30 @@ def product_delete(request):
 
 # categories views.py
 @login_required
-def categories_list(request):
-    categories = Category.objects.all()
+async def categories_list(request):
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url+"categories/")
+    if response.status_code == 200:
+        print(response.json())
+        categories = response.json()
+    #categories = Category.objects.all()
+    #categories = Category.objects.all()
     return render(request, 'main/categories/all.html', {'categories': categories})
 
 @login_required
-def category_add(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        category = Category(name=name)
-        category.save()
-        return redirect('categories_list')
+async def category_add(request):
+    name = request.POST.get('name')
+    data = {
+        "name": name,
+        "category": {"name": name},  
+        "emoji": "🍔"
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url+"categories/", json=data)
+
+        if response.status_code == 200:
+            return redirect('categories_list')
 
     return render(request, 'main/categories/add.html')
 
