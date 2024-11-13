@@ -4,6 +4,8 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # Importe o modelo de usuário
 from .models import Product
+from django.contrib.auth import logout
+
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -11,6 +13,10 @@ from .models import Product, Category  # Assumindo que temos um modelo Product e
 from django.contrib import messages
 from .models import Client
 from .models import Order
+from .models import Message
+
+
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -27,6 +33,7 @@ def login_view(request):
     return render(request, 'login.html')
 
 def logout_view(request):
+    logout(request)
     return render(request, 'login.html')
 
 @login_required
@@ -39,8 +46,9 @@ def users_add(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        email = request.POST.get('email')
-        user = User.objects.create_user(username, email, password)
+        name = request.POST.get('name')
+        role = request.POST.get('role')
+        user = User.objects.create_user(username, name, password, role)
         user.save()
         return redirect('users_list')
 
@@ -52,6 +60,9 @@ def users_edit(request, id):
     if request.method == 'POST':
         user.username = request.POST.get('username')
         user.email = request.POST.get('email')
+        user.set_password(request.POST.get('password'))
+        user.name = request.POST.get('name')
+        user.role = request.POST.get('role')
         user.save()
         return redirect('users_list')
 
@@ -255,3 +266,40 @@ def order_delete(request):
         order.delete()
         return redirect('orders_list')
     return redirect('orders_list')
+
+
+# Exibição da lista de mensagens
+@login_required
+def messages_list(request):
+    messages_list = Message.objects.all()
+    return render(request, 'main/messages/all.html', {'messages': messages_list})
+
+
+# Editar mensagem existente
+@login_required
+@csrf_exempt
+def messages_edit(request, id):
+    print(id)
+    message = get_object_or_404(Message, id=id)
+
+    if request.method == 'POST':
+        message.description = request.POST.get('description')
+        message.text = request.POST.get('text')
+        message.save()
+        return redirect('messages_list')
+
+    return render(request, 'main/messages/edit.html', {'messages': message})
+
+# Deletar mensagem
+@login_required
+def messages_delete(request):
+    if request.method == 'POST':
+        message_id = request.POST.get('id')
+        message = get_object_or_404(Message, id=message_id)
+        message.delete()
+        return redirect('messages_list')
+
+    return redirect('messages_list')
+
+
+
