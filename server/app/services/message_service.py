@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 
 from app.models.message_model import Message
@@ -17,9 +19,11 @@ def get_message(db: Session, message_id: int):
 
 def create_message(db: Session, message: MessageCreate):
     db_message = Message(
-        name=message.name,
-        description=message.description,
-        text=message.text
+        chat_id=message.chat_id,
+        created_date=datetime.now(),
+        message=message.message,
+        user_id=message.user_id,
+        client_id=message.client_id
     )
     db.add(db_message)
     db.commit()
@@ -30,9 +34,7 @@ def create_message(db: Session, message: MessageCreate):
 def update_message(db: Session, message_id: int, message: MessageCreate):
     db_message = get_object_by_id(db, Message, message_id, "Message not found")
 
-    db_message.name = message.name
-    db_message.description = message.description
-    db_message.text = message.text
+    db_message.message = message.message
     db.commit()
     db.refresh(db_message)
     return db_message
