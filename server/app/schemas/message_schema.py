@@ -12,6 +12,7 @@ class MessageBase(BaseModel):
 class MessageCreate(MessageBase):
     user_id: Optional[int] = None
     client_id: Optional[int] = None
+    created_date: datetime = datetime.now()
 
 
 class MessageResponse(MessageBase):
