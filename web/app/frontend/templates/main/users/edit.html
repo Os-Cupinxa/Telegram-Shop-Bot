@@ -13,6 +13,7 @@
 {% if user %}
 <form method="post" action="{% url 'users_edit' user.id %}">
   {% csrf_token %}
+  <input type="hidden" name="_method" value="PUT">
   <div class="form-group row">
     <label class="col-sm-2">Id:</label>
     <div class="col-sm-10">
@@ -29,10 +30,10 @@
   </div>
 
   <div class="form-group row">
-    <label class="col-sm-2">Username:</label>
+    <label class="col-sm-2">E-mail:</label>
     <div class="col-sm-10">
-      <input class="form-control" name="username" value="{{ user.username }}">
-      {% if username_error %}<div class="text-warning">{{ username_error }}</div>{% endif %}
+      <input class="form-control" name="email" value="{{ user.email }}">
+      {% if email_error %}<div class="text-warning">{{ email_error }}</div>{% endif %}
     </div>
   </div>
 
@@ -41,17 +42,6 @@
     <div class="col-sm-10">
       <input class="form-control" name="password">
       {% if password_error %}<div class="text-warning">{{ password_error }}</div>{% endif %}
-    </div>
-  </div>
-
-  <div class="form-group row">
-    <label class="col-sm-2">Role:</label>
-    <div class="col-sm-10">
-      <select class="form-control" name="role">
-        {% for role in roles %}
-        <option value="{{ role.name }}">{{ role.value }}</option>
-        {% endfor %}
-      </select>
     </div>
   </div>
 

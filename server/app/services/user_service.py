@@ -40,6 +40,26 @@ def create_user(db: Session, user: UserCreate):
 def get_user(db: Session, user_id: int):
     return db.query(User).filter(and_(User.id == user_id)).first()
 
+def get_all_users(db: Session):
+    return db.query(User).all()
+
+def put_user(db: Session, user_id: int, user: UserCreate):
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if db_user is None:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    db_user.name = user.name
+    db_user.email = user.email
+    db_user.password = get_password_hash(user.password)
+
+    db.commit()
+    db.refresh(db_user)
+
+    return {"message": "User updated successfully"}
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)

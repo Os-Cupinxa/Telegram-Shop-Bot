@@ -20,3 +20,13 @@ def read_user(user_id: int, db: Session = Depends(get_db), current_user: int = D
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
+
+@router.get("/users/", tags=["Users"])
+def read_users(db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    users = user_service.get_all_users(db)
+    return users
+
+@router.put("/users/{user_id}", tags=["Users"])
+def update_user(user_id: int, user: UserCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    user_service.put_user(db, user_id, user)
+    return {"message": "User updated successfully"}

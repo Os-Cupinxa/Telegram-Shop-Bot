@@ -15,58 +15,118 @@ from .models import Client
 from .models import Order
 from .models import Message
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+
 
 import httpx
 
 url = "http://localhost:8001/"
 
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            login(request, user)
-            return redirect('users_list')  # Redireciona para a aba de usuários
-        else:
-            return HttpResponseRedirect('/?error=true')  # Redireciona com erro
+async def login_view(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    dataUser = {
+        "email": username,
+        "password": password
+    }
 
-    return render(request, 'login.html')
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url + "login/", json=dataUser)
+
+    if response.status_code == 200:
+        # Salvar o token de autenticação de acess token no cookie
+        response_json = response.json()
+        redirect_response = HttpResponseRedirect('users')
+        redirect_response.set_cookie('access_token', response_json['access_token'])
+        return redirect_response
+    else:
+        return render(request, 'login.html')
 
 def logout_view(request):
     logout(request)
     return render(request, 'login.html')
 
-@login_required
-def users_list(request):
-    users = User.objects.all()  # Obtenha todos os usuários
-    return render(request, 'main/users/all.html', {'users': users})
+async def users_list(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
 
-@login_required
-def users_add(request):
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url + "users/", headers=headers)
+
+    if response.status_code == 200:
+        users = response.json()
+        return render(request, 'main/users/all.html', {'users': users})
+    else:
+        return HttpResponse("Erro ao obter usuários", status=response.status_code)
+
+async def users_add(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        token = request.COOKIES.get('access_token')
+        if not token:
+            return redirect('login')
+        
+        headers = {'Authorization': f'Bearer {token}'}
+
+        email  = request.POST.get('email')
         password = request.POST.get('password')
-        name = request.POST.get('name')
-        role = request.POST.get('role')
-        user = User.objects.create_user(username, name, password, role)
-        user.save()
-        return redirect('users_list')
+        username = request.POST.get('username')
 
-    return render(request, 'main/users/add.html')
+        dataUser = {
+            "email": email,
+            "password": password,
+            "name": username
+        }
 
-@login_required
-def users_edit(request, id):
-    user = User.objects.get(id=id)
-    if request.method == 'POST':
-        user.username = request.POST.get('username')
-        user.email = request.POST.get('email')
-        user.set_password(request.POST.get('password'))
-        user.name = request.POST.get('name')
-        user.role = request.POST.get('role')
-        user.save()
-        return redirect('users_list')
+        print(dataUser)
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url + "users/", json=dataUser, headers=headers)
+
+        if response.status_code == 200:
+            return redirect('users_list')
+        else:
+            return HttpResponse("Erro ao adicionar usuário", status=response.status_code)
+    else:
+        return render(request, 'main/users/add.html')
+    
+
+async def users_edit(request, id):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
+
+    print(request.method)
+
+    if request.method == 'GET':
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url + f"users/{id}", headers=headers)
+
+        if response.status_code == 200:
+            user = response.json()
+            return render(request, 'main/users/edit.html', {'user': user})
+        else:
+            return HttpResponse("Erro ao obter usuário", status=response.status_code)
+    
+    if request.method == 'POST' and request.POST.get('_method') == 'PUT':
+        user = request.POST
+        dataUser = {
+            "email": user.get('email'),
+            "password": user.get('password'),
+            "name": user.get('name')
+        }
+        print(dataUser)
+        async with httpx.AsyncClient() as client:
+            response = await client.put(url + f"users/{id}", json=dataUser, headers=headers)
+
+        if response.status_code == 200:
+            return redirect('users_list')
+        else:
+            return HttpResponse("Erro ao editar usuário", status=response.status_code)
 
     return render(request, 'main/users/edit.html', {'user': user})
 
@@ -83,17 +143,27 @@ def users_delete(request):
 # views.py
 
 
-@login_required
 async def products_list(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
+    
     async with httpx.AsyncClient() as client:
-        response = await client.get(url+"products/")
+        response = await client.get(url+"products/", headers=headers)
     if response.status_code == 200:
         products = response.json()
     return render(request, 'main/products/all.html', {'products': products})
 
-@login_required
 @csrf_exempt
 async def product_add(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
+
     if request.method == "POST":
         product = request.POST
         dataProduct = {
@@ -105,7 +175,7 @@ async def product_add(request):
         }
         
         async with httpx.AsyncClient() as client:
-            response = await client.post(url + "products/", json=dataProduct)
+            response = await client.post(url + "products/", json=dataProduct, headers=headers)
 
         if response.status_code == 200:
             return redirect('products_list')
@@ -124,7 +194,7 @@ def product_edit(request, id):
         product.category = get_object_or_404(Category, id=category_id)
         product.price = request.POST.get('price')
 
-        if 'photo' in request.FILES:
+        if 'photo' in request.FILES:    
             product.photo = request.FILES['photo']
 
         product.save()
@@ -146,35 +216,42 @@ def product_delete(request):
 
 
 # categories views.py
-@login_required
 async def categories_list(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
     async with httpx.AsyncClient() as client:
-        response = await client.get(url+"categories/")
+        headers = {'Authorization': f'Bearer {token}'}
+        response = await client.get(url+"categories/", headers=headers)
     if response.status_code == 200:
         print(response.json())
         categories = response.json()
-    #categories = Category.objects.all()
-    #categories = Category.objects.all()
     return render(request, 'main/categories/all.html', {'categories': categories})
 
-@login_required
 async def category_add(request):
+    # Resgatar o token do cookie
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')  # Redireciona para login se não tiver o token
+
     name = request.POST.get('name')
     data = {
         "name": name,
-        "category": {"name": name},  
+        "category": {"name": name},
         "emoji": "🍔"
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.post(url+"categories/", json=data)
+        # Passa o token Bearer no header da requisição
+        headers = {'Authorization': f'Bearer {token}'}
+        response = await client.post(url + "categories/", json=data, headers=headers)
 
-        if response.status_code == 200:
-            return redirect('categories_list')
+    if response.status_code == 200:
+        return redirect('categories_list')
 
     return render(request, 'main/categories/add.html')
 
-@login_required
 def category_edit(request, id):
     category = Category.objects.get(id=id)
     if request.method == 'POST':
@@ -184,7 +261,6 @@ def category_edit(request, id):
 
     return render(request, 'main/categories/edit.html', {'category': category})
 
-@login_required
 def category_delete(request):
     if request.method == 'POST':
         category_id = request.POST.get('id')
