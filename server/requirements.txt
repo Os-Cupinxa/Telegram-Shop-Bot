@@ -3,6 +3,8 @@ uvicorn
 sqlalchemy
 passlib
 python-jose
+python-socketio
+fastapi-socketio
 bcrypt
 pydantic
 mysql-connector-python
