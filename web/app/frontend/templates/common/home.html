@@ -17,7 +17,9 @@
 </head>
 
 <body class="bg-info">
+    {% if request.COOKIES.access_token %}
     {% include 'common/navbar.html' %}
+    {% endif %}
 
     <div class="container mt-5 mb-5">
         <div class="card">

@@ -23,6 +23,10 @@ import httpx
 url = "http://localhost:8001/"
 
 async def login_view(request):
+    token = request.COOKIES.get('access_token')
+    if token:
+        return redirect('users_list')
+
     username = request.POST.get('username')
     password = request.POST.get('password')
     dataUser = {
@@ -43,8 +47,19 @@ async def login_view(request):
         return render(request, 'login.html')
 
 def logout_view(request):
+    # Realiza o logout do usuário
     logout(request)
-    return render(request, 'login.html')
+    print(request)
+
+    # Cria uma resposta de redirecionamento para a página de login
+    response = redirect('login')
+    
+
+    # Remove o cookie 'access_token'
+    response.delete_cookie('access_token', path='/')
+    
+
+    return response
 
 async def users_list(request):
     token = request.COOKIES.get('access_token')
@@ -80,8 +95,6 @@ async def users_add(request):
             "name": username
         }
 
-        print(dataUser)
-
         async with httpx.AsyncClient() as client:
             response = await client.post(url + "users/", json=dataUser, headers=headers)
 
@@ -100,8 +113,6 @@ async def users_edit(request, id):
     
     headers = {'Authorization': f'Bearer {token}'}
 
-    print(request.method)
-
     if request.method == 'GET':
         async with httpx.AsyncClient() as client:
             response = await client.get(url + f"users/{id}", headers=headers)
@@ -119,7 +130,6 @@ async def users_edit(request, id):
             "password": user.get('password'),
             "name": user.get('name')
         }
-        print(dataUser)
         async with httpx.AsyncClient() as client:
             response = await client.put(url + f"users/{id}", json=dataUser, headers=headers)
 
@@ -225,7 +235,6 @@ async def categories_list(request):
         headers = {'Authorization': f'Bearer {token}'}
         response = await client.get(url+"categories/", headers=headers)
     if response.status_code == 200:
-        print(response.json())
         categories = response.json()
     return render(request, 'main/categories/all.html', {'categories': categories})
 
@@ -377,7 +386,6 @@ def messages_list(request):
 @login_required
 @csrf_exempt
 def messages_edit(request, id):
-    print(id)
     message = get_object_or_404(Message, id=id)
 
     if request.method == 'POST':
