@@ -20,7 +20,7 @@ def read_message(message_id: int, db: Session = Depends(get_db), current_user: i
 
 
 @router.post("/messages/", response_model=MessageResponse, tags=["Messages"])
-def create_message(message: MessageCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+def create_message(message: MessageCreate, db: Session = Depends(get_db)):
     return message_service.create_message(db, message)
 
 
