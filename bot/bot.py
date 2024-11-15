@@ -1,5 +1,7 @@
+import asyncio
 import logging
 
+import nest_asyncio
 from telegram import ReplyKeyboardRemove, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -17,6 +19,9 @@ from chat import start_chat, save_message
 from checkout import checkout, confirm_order
 from orders import get_orders, navigate_order, get_order_details
 from registering import process_name, process_phone, process_city, process_address
+from socket_config import connect_to_backend
+
+nest_asyncio.apply()
 
 # Enable logging
 logging.basicConfig(
@@ -147,7 +152,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text(help_text, parse_mode='Markdown')
 
 
-def main() -> None:
+async def main() -> None:
     application = Application.builder().token("8007696885:AAEAB7ezULO2X2sAYGN23KbweAowb9XtsM8").build()
 
     application.add_handler(CommandHandler("iniciar", start))
@@ -168,8 +173,9 @@ def main() -> None:
 
     application.add_handler(MessageHandler((filters.TEXT | filters.CONTACT) & ~filters.COMMAND, handle_input))
 
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    await connect_to_backend()
+    await application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
