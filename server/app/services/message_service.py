@@ -20,7 +20,7 @@ def get_message(db: Session, message_id: int):
 def create_message(db: Session, message: MessageCreate):
     db_message = Message(
         chat_id=message.chat_id,
-        created_date=datetime.now(),
+        created_date=message.created_date,
         message=message.message,
         user_id=message.user_id,
         client_id=message.client_id
