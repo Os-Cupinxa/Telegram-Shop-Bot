@@ -166,6 +166,7 @@ async def products_list(request):
         response = await client.get(url+"products/", headers=headers)
     if response.status_code == 200:
         products = response.json()
+
     return render(request, 'main/products/all.html', {'products': products})
 
 @csrf_exempt
@@ -175,6 +176,16 @@ async def product_add(request):
         return redirect('login')
     
     headers = {'Authorization': f'Bearer {token}'}
+
+    if request.method == 'GET':
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url + "categories/", headers=headers)
+
+        if response.status_code == 200:
+            categories = response.json()
+            return render(request, 'main/products/add.html', {'categories': categories})
+        else:
+            return HttpResponse("Erro ao obter categorias", status=response.status_code)
 
     if request.method == "POST":
         product = request.POST
@@ -195,25 +206,54 @@ async def product_add(request):
             return HttpResponse("Erro ao adicionar produto", status=response.status_code)
     return render(request, 'main/products/add.html')    
     
-@login_required
-@csrf_exempt
-def product_edit(request, id):
-    product = get_object_or_404(Product, id=id)
+
+async def product_edit(request, id):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+
+    headers = {'Authorization': f'Bearer {token}'}
+    if request.method == 'GET':
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url + f"products/{id}", headers=headers)
+
+        if response.status_code == 200:
+            product = response.json()
+
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url + "categories/", headers=headers)
+
+        if response.status_code == 200:
+            categories = response.json()
+            product['categories'] = categories
+            return render(request, 'main/products/edit.html', {'product': product})
+        else:
+            return HttpResponse("Erro ao obter produto", status=response.status_code)
+        
     if request.method == 'POST':
-        product.name = request.POST.get('name')
-        product.description = request.POST.get('description')
-        category_id = request.POST.get('category')
-        product.category = get_object_or_404(Category, id=category_id)
-        product.price = request.POST.get('price')
 
-        if 'photo' in request.FILES:    
-            product.photo = request.FILES['photo']
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        category_id = int(request.POST.get('category', 0))  # Valor padrão como 0 se não fornecido
+        price = float(request.POST.get('price', 0))  # Valor padrão como 0.0 se não fornecido
+        photo_url = request.POST.get('photo_url')
 
-        product.save()
-        return redirect('products_list')
+        dataProduct = {
+            "category_id": category_id,
+            "photo_url": photo_url,
+            "name": name,
+            "description": description,
+            "price": price
+        }
+        async with httpx.AsyncClient() as client:
+            response = await client.put(url + f"products/?product_id={id}", json=dataProduct, headers=headers)
 
-    categories = Category.objects.all()
-    return render(request, 'main/products/edit.html', {'product': product, 'categories': categories})
+        if response.status_code == 200:
+            return redirect('products_list')
+        else:
+            return HttpResponse("Erro ao editar produto", status=response.status_code)
+        
+    return render(request, 'main/products/edit.html', {'product': product})
 
 @login_required
 @csrf_exempt

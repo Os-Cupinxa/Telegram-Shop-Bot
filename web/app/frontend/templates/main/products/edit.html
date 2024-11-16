@@ -20,8 +20,8 @@
   <div class="form-group row">
     <label class="col-sm-2">Photo:</label>
     <div class="col-sm-10">
-      <input type="hidden" name="photoUrl" value="{{ product.photoUrl }}">
-      <input class="form-control" id="photo" type="input" name="photo" value="{{ product.photoUrl }}"
+      <input type="hidden" name="photo_url" value="{{ product.photo_url }}">
+      <input class="form-control" id="photo" type="input" name="photo" value="{{ product.photo_url }}"
         placeholder="www.photo.com.br" required>
     </div>
   </div>
@@ -46,8 +46,8 @@
     <label class="col-sm-2">Category:</label>
     <div class="col-sm-10">
       <select class="form-control selectpicker" name="category" data-live-search="true" data-size="4">
-        {% if not product.category %}<option selected>—</option>{% endif %}
-        {% for category in categories %}
+        {% if not product.category_id %}<option selected>—</option>{% endif %}
+        {% for category in product.categories %}
         <option value="{{ category.id }}">
           {{ category.name }}
         </option>

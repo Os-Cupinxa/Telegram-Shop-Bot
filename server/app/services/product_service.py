@@ -37,12 +37,16 @@ def create_product(db: Session, product: ProductCreate):
 
 
 def update_product(db: Session, product_id: int, product: ProductCreate):
+    
     db_product = get_object_by_id(db, Product, product_id, "Product not found")
     get_object_by_id(db, Category, product.category_id, "Category not found")
 
     db_product.category_id = product.category_id
-    db_product.status = product.status
-    db_product.amount = product.amount
+    db_product.photo_url = product.photo_url
+    db_product.name = product.name
+    db_product.description = product.description
+    db_product.price = product.price
+    
     db.commit()
     db.refresh(db_product)
     return db_product
