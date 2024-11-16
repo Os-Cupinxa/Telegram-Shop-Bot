@@ -1,2 +1,5 @@
 python-telegram-bot
+python-socketio
+aiohttp
+nest_asyncio
 httpx

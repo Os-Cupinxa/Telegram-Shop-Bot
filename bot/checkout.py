@@ -70,8 +70,6 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await query.edit_message_text(message, parse_mode='Markdown')
         await show_user_info(update, context)
     else:
-        print(response.status_code)
-        print(response.text)
         error_message = (
             f"❌ *Erro ao salvar seu pedido!*\n\n"
             f"Por favor, tente novamente mais tarde!\n"

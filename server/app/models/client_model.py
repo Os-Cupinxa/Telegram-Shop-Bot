@@ -15,3 +15,4 @@ class Client(Base):
     is_active = Column(Boolean, nullable=False, default=True)
 
     orders = relationship("Order", back_populates="client")
+    messages = relationship("Message", back_populates="client", lazy="select")

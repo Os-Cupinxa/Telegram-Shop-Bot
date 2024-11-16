@@ -1,5 +1,7 @@
+import asyncio
 import logging
 
+import nest_asyncio
 from telegram import ReplyKeyboardRemove, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -13,9 +15,16 @@ from account import log_in, check_user_by_cpf, choose_info_to_edit, show_user_in
     update_city, update_address, edit_name, edit_phone, edit_city, edit_address
 from cart import show_cart, handle_quantity, add_to_cart, prompt_remove_item, confirm_remove_from_cart
 from catalogue import show_catalogue_categories, get_products, navigate_product
+from chat import start_chat, save_message
 from checkout import checkout, confirm_order
 from orders import get_orders, navigate_order, get_order_details
 from registering import process_name, process_phone, process_city, process_address
+from socket_config import connect_to_backend
+
+nest_asyncio.apply()
+
+TELEGRAM_BOT_TOKEN = '8007696885:AAEAB7ezULO2X2sAYGN23KbweAowb9XtsM8'
+TELEGRAM_API_URL = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage'
 
 # Enable logging
 logging.basicConfig(
@@ -120,6 +129,9 @@ async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     elif context.user_data.get('awaiting_quantity', False):
         await handle_quantity(update, context)
 
+    elif context.user_data.get('awaiting_chat_inputs', False):
+        await save_message(update, context)
+
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.clear()
@@ -134,6 +146,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "🔹 /iniciar - Iniciar a conversa\n"
         "🔹 /cancelar - Cancelar a conversa\n"
         "🔹 /carrinho - Ver seu carrinho de compras\n"
+        "🔹 /chat - Iniciar conversa com atendente\n"
         "🔹 /conta - Ver informações da sua conta\n"
         "🔹 /ajuda - Mostrar esta lista de comandos\n"
         "\n💬 *Se precisar de ajuda adicional, estou à disposição!*"
@@ -142,12 +155,13 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text(help_text, parse_mode='Markdown')
 
 
-def main() -> None:
-    application = Application.builder().token("8007696885:AAEAB7ezULO2X2sAYGN23KbweAowb9XtsM8").build()
+async def main() -> None:
+    application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
     application.add_handler(CommandHandler("iniciar", start))
     application.add_handler(CommandHandler("cancelar", cancel))
     application.add_handler(CommandHandler("carrinho", show_cart))
+    application.add_handler(CommandHandler("chat", start_chat))
     application.add_handler(CommandHandler("conta", show_user_info))
     application.add_handler(CommandHandler("ajuda", help_command))
 
@@ -162,8 +176,9 @@ def main() -> None:
 
     application.add_handler(MessageHandler((filters.TEXT | filters.CONTACT) & ~filters.COMMAND, handle_input))
 
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    await connect_to_backend()
+    await application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
