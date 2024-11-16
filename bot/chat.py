@@ -23,15 +23,13 @@ async def save_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     message = update.message.text
     user_info = context.user_data.get('user_info', {})
     client_id = user_info['id']
+    chat_id = update.message.chat.id
 
     new_message_data = {
-        "chat_id": 1,
+        "chat_id": chat_id,
         "message": message,
         "client_id": client_id,
     }
 
-    print(new_message_data)
-
     async with httpx.AsyncClient() as client:
-        response = await client.post("http://127.0.0.1:8001/messages/", json=new_message_data)
-        print(response.json())
+        await client.post("http://127.0.0.1:8001/messages/", json=new_message_data)

@@ -23,6 +23,9 @@ from socket_config import connect_to_backend
 
 nest_asyncio.apply()
 
+TELEGRAM_BOT_TOKEN = '8007696885:AAEAB7ezULO2X2sAYGN23KbweAowb9XtsM8'
+TELEGRAM_API_URL = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage'
+
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -153,7 +156,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 
 async def main() -> None:
-    application = Application.builder().token("8007696885:AAEAB7ezULO2X2sAYGN23KbweAowb9XtsM8").build()
+    application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
     application.add_handler(CommandHandler("iniciar", start))
     application.add_handler(CommandHandler("cancelar", cancel))
