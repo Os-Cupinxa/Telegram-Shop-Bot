@@ -281,24 +281,48 @@ def category_delete(request):
     return redirect('categories_list')
 
 # clients views.py
-@login_required
-def clients_list(request):
-    clients = Client.objects.all()
-    return render(request, 'main/clients/all.html', {'clients': clients})
-
-
-@login_required
-def client_edit(request, id):
-    # Carrega o cliente ou retorna 404 se não existir
-    client = get_object_or_404(Client, id=id)
+async def clients_list(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
     
+    headers = {'Authorization': f'Bearer {token}'}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url + "clients/", headers=headers)
+
+    if response.status_code == 200:
+        clients = response.json()
+        return render(request, 'main/clients/all.html', {'clients': clients})
+    else:
+        return HttpResponse("Erro ao obter clientes", status=response.status_code)
+
+async def client_edit(request, id):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')  # Certifique-se de que 'login' é uma rota válida.
+
+    headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
+
+    # Lidar com requisições GET
+    if request.method == 'GET':
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url + f"clients/{id}", headers=headers)
+
+        if response.status_code == 200:
+            client = response.json()
+            return render(request, 'main/clients/edit.html', {'client': client})
+        else:
+            return HttpResponse("Erro ao obter cliente", status=response.status_code)
+
+    # Lidar com requisições PUT
     if request.method == 'POST':
-        # Obter dados do formulário
         name = request.POST.get('name')
+        cpf = request.POST.get('cpf')
         phoneNumber = request.POST.get('phoneNumber')
         city = request.POST.get('city')
         address = request.POST.get('address')
-        active = request.POST.get('active') == 'true'
+        active = request.POST.get('is_active') == '1'
 
         # Validação simples para os campos obrigatórios
         errors = {}
@@ -312,23 +336,32 @@ def client_edit(request, id):
             errors['addressError'] = "Address is required."
 
         if errors:
-            # Exibe os erros no formulário se houver
             return render(request, 'main/clients/edit.html', {'client': client, **errors})
 
-        # Atualiza os campos do cliente
-        client.name = name
-        client.phoneNumber = phoneNumber
-        client.city = city
-        client.address = address
-        client.active = active
-        client.save()
+        # Dados do cliente
+        dataClient = {
+            "name": name,
+            "cpf": cpf,
+            "phone_number": phoneNumber,
+            "city": city,
+            "address": address,
+            "is_active": active
+        }
+        
 
-        # Exibe mensagem de sucesso e redireciona para a lista de clientes (ou outra página)
-        messages.success(request, "Client updated successfully.")
-        return redirect('client_list')  # Substitua por sua URL de lista de clientes
+        # Atualizar cliente na API
+        async with httpx.AsyncClient() as client:
+            response = await client.put(url + f"clients/?client_id={id}", json=dataClient, headers=headers)
 
-    # Exibe o formulário com os dados atuais do cliente
-    return render(request, 'main/clients/edit.html', {'client': client})
+        if response.status_code == 200:
+            messages.success(request, "Client updated successfully.")
+            return redirect('clients_list')  # Redirecionar para a lista de clientes ou outra rota válida.
+
+        messages.error(request, "Error updating client.")
+        return render(request, 'main/clients/edit.html', {'client': dataClient})
+
+    return HttpResponse("Method not allowed", status=405)
+
 
 # broadcast views.py7
 #@login_required

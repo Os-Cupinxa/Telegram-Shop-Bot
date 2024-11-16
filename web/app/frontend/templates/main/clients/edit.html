@@ -5,7 +5,7 @@
 
 {% block content %}
 
-{% if client %}
+{% if client and client.id %}
 <form method="post" action="{% url 'client_edit' client.id %}">
   {% csrf_token %}
 
@@ -26,7 +26,7 @@
   <div class="form-group row">
     <label class="col-sm-2">Name:</label>
     <div class="col-sm-10">
-      <input class="form-control" name="name" value="{{ client.name }}">
+      <input class="form-control" name="name" value="{{ client.name }}" required>
       {% if nameError %}
       <div class="text-warning">{{ nameError }}</div>
       {% endif %}
@@ -34,9 +34,16 @@
   </div>
 
   <div class="form-group row">
+    <label class="col-sm-2">CPF:</label>
+    <div class="col-sm-10">
+      <input class="form-control" name="cpf" value="{{ client.cpf }}" required>
+    </div>
+  </div>
+
+  <div class="form-group row">
     <label class="col-sm-2">Phone number:</label>
     <div class="col-sm-10">
-      <input class="form-control" name="phoneNumber" value="{{ client.phoneNumber }}">
+      <input class="form-control" name="phoneNumber" value="{{ client.phone_number }}" required>
       {% if phoneNumberError %}
       <div class="text-warning">{{ phoneNumberError }}</div>
       {% endif %}
@@ -46,7 +53,7 @@
   <div class="form-group row">
     <label class="col-sm-2">City:</label>
     <div class="col-sm-10">
-      <input class="form-control" name="city" value="{{ client.city }}">
+      <input class="form-control" name="city" value="{{ client.city }}" required>
       {% if cityError %}
       <div class="text-warning">{{ cityError }}</div>
       {% endif %}
@@ -56,7 +63,7 @@
   <div class="form-group row">
     <label class="col-sm-2">Address:</label>
     <div class="col-sm-10">
-      <input class="form-control" name="address" value="{{ client.address }}">
+      <input class="form-control" name="address" value="{{ client.address }}" required>
       {% if addressError %}
       <div class="text-warning">{{ addressError }}</div>
       {% endif %}
@@ -66,9 +73,9 @@
   <div class="form-group row">
     <label class="col-sm-2">Active:</label>
     <div class="col-sm-10">
-      <select class="form-control" name="active">
-        <option value="true" {% if client.active %}selected{% endif %}>Yes</option>
-        <option value="false" {% if not client.active %}selected{% endif %}>No</option>
+      <select class="form-control" name="is_active">
+        <option value="1" {% if client.is_active %}selected{% endif %}>Yes</option>
+        <option value="0" {% if not client.is_active %}selected{% endif %}>No</option>
       </select>
     </div>
   </div>
