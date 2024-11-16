@@ -6,7 +6,7 @@
 {% block content %}
 
   {% if order %}
-    <form method="post" action="{% url 'order_update' %}">
+    <form method="post" action="{% url 'order_edit' order.id %}">
       {% csrf_token %}
       <div class="form-group row">
         <label class="col-sm-2">Id:</label>
@@ -18,8 +18,8 @@
       <div class="form-group row">
         <label class="col-sm-2">Client:</label>
         <div class="col-sm-10">
-          <input type="hidden" name="client" value="{{ order.client.id }}">
-          {{ order.client.name }} (<a target="_blank" href="{% url 'client_edit' order.client.id %}">view</a>)
+          <input type="hidden" name="client" value="{{ order.client_id }}">
+          {{ order.client_id }} (<a target="_blank" href="{% url 'client_edit' order.client_id %}">view</a>)
         </div>
       </div>
 
@@ -27,7 +27,7 @@
         <label class="col-sm-2">Date:</label>
         <div class="col-sm-10">
           <input class="form-control" type="datetime-local" name="createdDate"
-                 value="{{ order.localDateTime|date:'Y-m-d\\TH:i' }}" readonly>
+                 value="{{ order.created_date }}" readonly>
         </div>
       </div>
 
@@ -52,7 +52,7 @@
         </div>
       </div>
 
-      {% include "items/all.html" %}
+      {% include "./items/all.html" %}
 
       <button class="btn btn-success" type="submit">Update</button>
     </form>

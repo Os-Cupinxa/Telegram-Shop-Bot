@@ -336,36 +336,84 @@ def client_edit(request, id):
 #    return render(request, 'main/broadcasts/add.html')
 
 # order views.py
-@login_required
-def orders_list(request):
-    orders = Order.objects.all()
+async def orders_list(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url + "orders/", headers=headers)
+    
+    if response.status_code == 200:
+        orders = response.json()
+
     return render(request, 'main/orders/all.html', {'orders': orders})
 
-@login_required
-def order_add(request):
-    if request.method == 'POST':
-        client_id = request.POST.get('client')
-        client = get_object_or_404(Client, id=client_id)
-        amount = request.POST.get('amount')
-        order = Order(client=client, amount=amount)
-        order.save()
-        return redirect('orders_list')
+# @login_required
+# async def order_add(request):
+#     token = request.COOKIES.get('access_token')
+#     if not token:
+#         return redirect('login')
+    
+#     headers = {'Authorization': f'Bearer {token}'}
 
-    clients = Client.objects.all()
-    return render(request, 'main/orders/add.html', {'clients': clients})
 
-@login_required
-def order_edit(request, id):
-    order = get_object_or_404(Order, id=id)
-    if request.method == 'POST':
-        client_id = request.POST.get('client')
-        order.client = get_object_or_404(Client, id=client_id)
-        order.amount = request.POST.get('amount')
-        order.save()
-        return redirect('orders_list')
+#     if request.method == 'POST':
+        
+#         return redirect('orders_list')
 
-    clients = Client.objects.all()
-    return render(request, 'main/orders/edit.html', {'order': order, 'clients': clients})
+#     clients = Client.objects.all()
+#     return render(request, 'main/orders/add.html', {'clients': clients})
+
+async def order_edit(request, id):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
+
+    if request.method == 'GET':
+        async with httpx.AsyncClient() as client:
+            # Obter os detalhes do pedido
+            response = await client.get(url + f"orders/{id}", headers=headers)
+
+        if response.status_code == 200:
+            order = response.json()
+
+            # Obter itens associados ao pedido
+            async with httpx.AsyncClient() as client:
+                items_response = await client.get(url + f"orders/items/{id}", headers=headers)
+
+            if items_response.status_code == 200:
+                order['items'] = items_response.json()  # Adiciona os itens ao pedido
+            else:
+                order['items'] = []  # Caso dê erro, atribuir lista vazia
+
+            print(order)
+
+            return render(request, 'main/orders/edit.html', {'order': order})
+        else:
+            return HttpResponse("Erro ao obter pedido", status=response.status_code)
+
+    if request.method == 'POST' and request.POST.get('_method') == 'PUT':
+        # Extrair dados do formulário enviado
+        order = request.POST
+        dataOrder = {
+            "client_id": order.get('client_id'),
+            "amount": order.get('amount'),
+            "status": order.get('status'),
+            "items": json.loads(order.get('items', '[]')),  # Garante que itens seja uma lista válida
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.put(url + f"orders/{id}", json=dataOrder, headers=headers)
+
+        if response.status_code == 200:
+            return redirect('orders_list')
+        else:
+            return HttpResponse("Erro ao editar pedido", status=response.status_code)
 
 @login_required
 def order_delete(request):

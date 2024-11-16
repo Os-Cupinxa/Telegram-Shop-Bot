@@ -35,7 +35,6 @@ urlpatterns = [
 
     # Order paths
     path('orders/', views.orders_list, name='orders_list'),
-    path('orders/add', views.order_add, name='order_add'),
     path('orders/edit/<int:id>/', views.order_edit, name='order_edit'),
     path('orders/delete', views.order_delete, name='order_delete'),
     

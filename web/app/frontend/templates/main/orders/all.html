@@ -5,33 +5,33 @@
 
 {% block content %}
 
-  <table id="orders" class="table table-striped table-bordered" cellspacing="0" width="100%">
-    <thead>
-      <tr>
-        <th>Id</th>
-        <th>Client</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Amount</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for order in orders %}
-        <tr>
-          <td>{{ order.id }}</td>
-          <td>{{ order.client.name }} (<a target="_blank" href="{% url 'client_edit' order.client.id %}">view</a>)</td>
-          <td>{{ order.localDateTime|date:"d.m.Y H:i" }}</td>
-          <td>{{ order.get_status_display }}</td>
-          <td>{{ order.amount }} $</td>
-          <td>
-            <a class="btn btn-xs btn-info" href="{% url 'order_edit' order.id %}">
-              <i class="fa fa-pencil" aria-hidden="true"></i>
-            </a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<table id="orders" class="table table-striped table-bordered" cellspacing="0" width="100%">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Client</th>
+      <th>Date</th>
+      <th>Status</th>
+      <th>Amount</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+    <tr>
+      <td>{{ order.id }}</td>
+      <td>{{ order.client_id }} (<a target="_blank" href="{% url 'client_edit' order.client_id %}">view</a>)</td>
+      <td>{{ order.created_date}}</td>
+      <td>{{ order.status }}</td>
+      <td>{{ order.amount }} $</td>
+      <td>
+        <a class="btn btn-xs btn-info" href="{% url 'order_edit' order.id %}">
+          <i class="fa fa-pencil" aria-hidden="true"></i>
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}
