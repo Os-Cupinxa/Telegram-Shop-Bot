@@ -17,7 +17,16 @@
     </div>
   </div>
 
-  <button class="btn btn-success" type="submit">Create</button>
+  <div class="form-group row">
+    <label class="col-sm-2">Emoji:</label>
+    <div class="col-sm-10">
+      <input class="form-control" name="emoji" value="{{ category.emoji|default_if_none:'' }}">
+      {% if emojiError %}
+      <div class="text-warning">{{ emojiError }}</div>
+      {% endif %}
+    </div>
+
+    <button class="btn btn-success" type="submit">Create</button>
 </form>
 
 <form method="get" action="{% url 'categories_list' %}">

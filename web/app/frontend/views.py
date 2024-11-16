@@ -287,10 +287,11 @@ async def category_add(request):
         return redirect('login')  # Redireciona para login se não tiver o token
 
     name = request.POST.get('name')
+    emoji = request.POST.get('emoji')
     data = {
         "name": name,
         "category": {"name": name},
-        "emoji": "🍔"
+        "emoji": emoji
     }
 
     async with httpx.AsyncClient() as client:
@@ -303,12 +304,35 @@ async def category_add(request):
 
     return render(request, 'main/categories/add.html')
 
-def category_edit(request, id):
-    category = Category.objects.get(id=id)
+async def category_edit(request, id):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
+
+    if request.method == 'GET':
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url + f"categories/{id}", headers=headers)
+
+        if response.status_code == 200:
+            category = response.json()
+            return render(request, 'main/categories/edit.html', {'category': category})
+        else:
+            return HttpResponse("Erro ao obter categoria", status=response.status_code)
     if request.method == 'POST':
-        category.name = request.POST.get('name')
-        category.save()
-        return redirect('categories_list')
+        category = request.POST
+        dataCategory = {
+            "name": category.get('name'),
+            "emoji": category.get('emoji')
+        }
+        async with httpx.AsyncClient() as client:
+            response = await client.put(url + f"categories/?category_id={id}", json=dataCategory, headers=headers)
+
+        if response.status_code == 200:
+            return redirect('categories_list')
+        else:
+            return HttpResponse("Erro ao editar categoria", status=response.status_code)
 
     return render(request, 'main/categories/edit.html', {'category': category})
 

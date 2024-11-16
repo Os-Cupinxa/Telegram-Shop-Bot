@@ -25,6 +25,16 @@
     </div>
   </div>
 
+  <div class="form-group row">
+    <label class="col-sm-2">Emoji:</label>
+    <div class="col-sm-10">
+      <input class="form-control" name="emoji" value="{{ category.emoji }}">
+      {% if emojiError %}
+      <div class="text-warning">{{ emojiError }}</div>
+      {% endif %}
+    </div>
+  </div>
+
   <button class="btn btn-success" type="submit">Update</button>
 </form>
 
