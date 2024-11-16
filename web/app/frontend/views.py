@@ -391,8 +391,6 @@ async def order_edit(request, id):
             else:
                 order['items'] = []  # Caso dê erro, atribuir lista vazia
 
-            print(order)
-
             return render(request, 'main/orders/edit.html', {'order': order})
         else:
             return HttpResponse("Erro ao obter pedido", status=response.status_code)
@@ -416,12 +414,20 @@ async def order_edit(request, id):
             return HttpResponse("Erro ao editar pedido", status=response.status_code)
 
 @login_required
-def order_delete(request):
+async def order_delete(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
+
     if request.method == 'POST':
         order_id = request.POST.get('id')
-        order = get_object_or_404(Order, id=order_id)
-        order.delete()
-        return redirect('orders_list')
+        async with httpx.AsyncClient() as client:
+            response = await client.delete(url + f"orders/{order_id}", headers=headers)
+
+        if response.status_code == 200:
+            return redirect('orders_list')
     return redirect('orders_list')
 
 
