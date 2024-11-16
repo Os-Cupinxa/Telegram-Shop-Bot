@@ -142,13 +142,21 @@ async def users_edit(request, id):
 
     return render(request, 'main/users/edit.html', {'user': user})
 
-@login_required
-def users_delete(request):
+async def users_delete(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
     if request.method == 'POST':
         user_id = request.POST.get('id')
-        user = get_object_or_404(User, id=user_id)
-        user.delete()
-        return redirect('users_list')
+        async with httpx.AsyncClient() as client:
+            response = await client.delete(url + f"users/{user_id}", headers=headers)
+
+        if response.status_code == 200:
+            return redirect('users_list')
+        else:
+            return HttpResponse("Erro ao deletar usuário", status=response.status_code)
     return redirect('users_list')
 
 
@@ -255,15 +263,24 @@ async def product_edit(request, id):
         
     return render(request, 'main/products/edit.html', {'product': product})
 
-@login_required
 @csrf_exempt
-def product_delete(request):
+async def product_delete(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
+
     if request.method == 'POST':
         product_id = request.POST.get('id')
-        product = get_object_or_404(Product, id=product_id)
-        product.delete()
-        messages.success(request, "Product deleted successfully")
-        return redirect('products_list')
+        async with httpx.AsyncClient() as client:
+            response = await client.delete(url + f"products/{product_id}", headers=headers)
+
+        if response.status_code == 200:
+            return redirect('products_list')
+        else:
+            return HttpResponse("Erro ao deletar produto", status=response.status_code)
+        
     return redirect('products_list')
 
 
@@ -336,12 +353,23 @@ async def category_edit(request, id):
 
     return render(request, 'main/categories/edit.html', {'category': category})
 
-def category_delete(request):
+async def category_delete(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
+
     if request.method == 'POST':
         category_id = request.POST.get('id')
-        category = get_object_or_404(Category, id=category_id)
-        category.delete()
-        return redirect('categories_list')
+        async with httpx.AsyncClient() as client:
+            response = await client.delete(url + f"categories/{category_id}", headers=headers)
+
+        if response.status_code == 200:
+            return redirect('categories_list')
+        else:
+            return HttpResponse("Erro ao deletar categoria", status=response.status_code)
+        
     return redirect('categories_list')
 
 # clients views.py
