@@ -1,3 +1,5 @@
+import asyncio
+
 from sqlalchemy.orm import Session
 
 from app.models.message_model import Message
@@ -27,23 +29,29 @@ def create_message(db: Session, message: MessageCreate):
     db.commit()
     db.refresh(db_message)
 
-    if message.user_id:
-        send_to_bot(db_message)
-
-    if message.client_id:
-        send_to_client(db_message)
+    if message.client_id is None:
+        asyncio.run(send_to_bot(db_message))
+    else:
+        asyncio.run(send_to_client(db_message))
 
     return db_message
 
 
-def send_to_bot(message):
-    print(message)
-    # sio.emit('bot_message', {'message': message.message, 'chat_id': message.chat_id})
+async def send_to_bot(db_message: Message):
+    from app.main import sio
+    await sio.emit("new_message_to_bot", {
+        "chat_id": db_message.chat_id,
+        "message": db_message.message,
+        "user_id": db_message.user_id
+    })
 
-
-def send_to_client(message):
-    print(message)
-    # sio.emit('client_message', {'message': message.message, 'chat_id': message.chat_id})
+async def send_to_client(db_message: Message):
+    from app.main import sio
+    await sio.emit("new_message_to_web", {
+        "chat_id": db_message.chat_id,
+        "message": db_message.message,
+        "client_id": db_message.user_id
+    })
 
 
 def update_message(db: Session, message_id: int, message: MessageCreate):

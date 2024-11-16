@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, TIMESTAMP, BigInteger
 from sqlalchemy.orm import relationship
 
 from app.config.database import Base
@@ -8,7 +8,7 @@ class Message(Base):
     __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True, index=True)
-    chat_id = Column(Integer, nullable=False)
+    chat_id = Column(BigInteger, nullable=False)
     created_date = Column(TIMESTAMP(timezone=False), nullable=False)
     message = Column(Text, nullable=False)
 
