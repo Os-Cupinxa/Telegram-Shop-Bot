@@ -27,6 +27,9 @@ async def login_view(request):
     if token:
         return redirect('users_list')
 
+    if request.method == 'GET':
+        return render(request, 'login.html')
+
     username = request.POST.get('username')
     password = request.POST.get('password')
     dataUser = {
@@ -49,7 +52,6 @@ async def login_view(request):
 def logout_view(request):
     # Realiza o logout do usuário
     logout(request)
-    print(request)
 
     # Cria uma resposta de redirecionamento para a página de login
     response = redirect('login')
