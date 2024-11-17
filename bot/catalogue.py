@@ -2,9 +2,11 @@ import httpx
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler
 
+from env_config import SERVER_URL
+
 
 async def show_catalogue_categories(query: Update.callback_query, context: ContextTypes.DEFAULT_TYPE) -> None:
-    url = "http://127.0.0.1:8001/categories/"
+    url = f"{SERVER_URL}/categories/"
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
@@ -31,7 +33,7 @@ async def get_products(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await query.answer()
     category_id = query.data.split("-")[1]
 
-    url = f"http://127.0.0.1:8001/categories/{category_id}/products"
+    url = f"{SERVER_URL}/categories/{category_id}/products"
 
     async with httpx.AsyncClient() as products_client:
         response = await products_client.get(url)

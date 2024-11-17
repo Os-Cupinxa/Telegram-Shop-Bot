@@ -2,6 +2,8 @@ import httpx
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
+from env_config import SERVER_URL
+
 
 async def start_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_info = context.user_data.get('user_info', {})
@@ -32,4 +34,4 @@ async def save_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     }
 
     async with httpx.AsyncClient() as client:
-        await client.post("http://127.0.0.1:8001/messages/", json=new_message_data)
+        await client.post(f"{SERVER_URL}/messages/", json=new_message_data)

@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 import httpx
 
 from account import show_user_info
-from cart import show_cart
+from env_config import SERVER_URL
 from utils import format_date
 
 
@@ -51,7 +51,7 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.post("http://127.0.0.1:8001/orders/", json=order_data)
+        response = await client.post(f"{SERVER_URL}/orders/", json=order_data)
 
     if response.status_code == 200:
         context.user_data['cart'] = []

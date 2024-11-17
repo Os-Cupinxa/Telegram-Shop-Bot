@@ -2,6 +2,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 import httpx
 
+from env_config import SERVER_URL
 from utils import format_date
 
 
@@ -14,7 +15,7 @@ async def get_orders(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         await query.message.reply_text("ID do cliente não encontrado.")
         return
 
-    url = f"http://127.0.0.1:8001/orders/client/{client_id}"
+    url = f"{SERVER_URL}/orders/client/{client_id}"
 
     async with httpx.AsyncClient() as orders_client:
         response = await orders_client.get(url)
@@ -101,7 +102,7 @@ async def get_order_details(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         await query.message.reply_text("Pedido não encontrado.")
         return
 
-    url = f"http://127.0.0.1:8001/orders/items/{order_id}"
+    url = f"{SERVER_URL}/orders/items/{order_id}"
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url)

@@ -4,6 +4,7 @@ import httpx
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 
+from env_config import SERVER_URL
 from utils import is_cpf_valid
 
 
@@ -26,7 +27,7 @@ async def check_user_by_cpf(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
     context.user_data['awaiting_cpf_login'] = False
 
-    url = f"http://127.0.0.1:8001/clients/cpf/{cpf}"
+    url = f"{SERVER_URL}/clients/cpf/{cpf}"
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
@@ -199,7 +200,7 @@ async def update_user_in_database(update: Update, context: ContextTypes.DEFAULT_
 
     client_id = user_info.get('id')
 
-    url = f"http://127.0.0.1:8001/clients/?client_id={client_id}"
+    url = f"{SERVER_URL}/clients/?client_id={client_id}"
 
     async with httpx.AsyncClient() as client:
         try:

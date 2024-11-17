@@ -4,6 +4,8 @@ import httpx
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 
+from env_config import SERVER_URL
+
 
 async def start_registration(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     registration_message = (
@@ -71,7 +73,7 @@ async def process_address(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.post("http://127.0.0.1:8001/clients/", json=new_user_data)
+        response = await client.post(f"{SERVER_URL}/clients/", json=new_user_data)
 
     if response.status_code == 200:
         client_data = response.json()
