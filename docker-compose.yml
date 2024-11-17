@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  bot:
+    build: ./bot
+    container_name: bot_telegram
+    restart: always
+    depends_on:
+      - db
+      - server
+    environment:
+      SERVER_HOST: server
+      SERVER_PORT: 8001
+      TELEGRAM_BOT_TOKEN: 8007696885:AAEAB7ezULO2X2sAYGN23KbweAowb9XtsM8
+
+  server:
+    build: ./server
+    container_name: fastapi
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: telegramshopbot
+      DATABASE_PORT: 3306
+      TELEGRAM_BOT_TOKEN: 8007696885:AAEAB7ezULO2X2sAYGN23KbweAowb9XtsM8
+
+  #  web:
+  #    build: ./web  # Assumindo que há um Dockerfile no diretório "django"
+  #    container_name: web_django
+  #    restart: always
+  #    depends_on:
+  #      - db
+  #    ports:
+  #      - "8000:8000"
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_server
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: telegramshopbot
+      MYSQL_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
