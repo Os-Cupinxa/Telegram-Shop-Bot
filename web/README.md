@@ -9,8 +9,9 @@ pip install -r requirements.txt
 ```
 
 3 - Executar o servidor (web/app):
-````python manage.py runserver````
-
+````bash
+python manage.py runserver
+````
 [Website](http://localhost:8000)
 
 ## Instalar dependências:
