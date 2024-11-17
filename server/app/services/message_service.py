@@ -1,11 +1,15 @@
 import asyncio
+import re
 
+import httpx
 from sqlalchemy.orm import Session
 
 from app.models import Client, User
 from app.models.message_model import Message
 from app.schemas.message_schema import MessageCreate
 from app.services.global_service import get_object_by_id
+
+from app.config.env_config import TELEGRAM_API_URL
 
 
 def get_all_messages(db: Session):
@@ -43,13 +47,34 @@ def create_message(db: Session, message: MessageCreate):
     return db_message
 
 
+def escape_markdown(text: str) -> str:
+    escape_chars = r"([_*\[\]()~`>#+\-=|{}.!])"
+    return re.sub(escape_chars, r"\\\1", text)
+
+
 async def send_to_bot(db_message: Message, name: str):
-    from app.main import sio
-    await sio.emit("new_message_to_bot", {
-        "chat_id": db_message.chat_id,
-        "message": db_message.message,
-        "user_name": name
-    })
+    chat_id = db_message.chat_id
+    message = db_message.message
+    user_name = name
+
+    escaped_user_name = escape_markdown(user_name)
+    escaped_message = escape_markdown(message)
+
+    formatted_message = f"*{escaped_user_name}:*\n{escaped_message}"
+
+    payload = {
+        'chat_id': chat_id,
+        'text': formatted_message,
+        'parse_mode': 'Markdown'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(TELEGRAM_API_URL, params=payload)
+        if response.status_code == 200:
+            print(f"Message successfully sent to chat_id {chat_id}")
+        else:
+            print(f"Failed to send message. Status code: {response.status_code}, Response: {response.text}")
+
 
 async def send_to_client(db_message: Message, client: Client):
     from app.main import sio

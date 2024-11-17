@@ -1,7 +1,9 @@
 fastapi
 uvicorn
 sqlalchemy
+httpx
 passlib
+python-dotenv
 python-jose
 python-socketio
 fastapi-socketio
