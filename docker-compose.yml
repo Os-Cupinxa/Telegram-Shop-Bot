@@ -3,7 +3,7 @@ version: '3.9'
 services:
   bot:
     build: ./bot
-    container_name: bot_telegram
+    container_name: bot
     restart: always
     depends_on:
       - db
@@ -15,7 +15,7 @@ services:
 
   server:
     build: ./server
-    container_name: fastapi
+    container_name: server
     restart: always
     depends_on:
       - db
@@ -29,14 +29,14 @@ services:
       DATABASE_PORT: 3306
       TELEGRAM_BOT_TOKEN: 8007696885:AAEAB7ezULO2X2sAYGN23KbweAowb9XtsM8
 
-  #  web:
-  #    build: ./web  # Assumindo que há um Dockerfile no diretório "django"
-  #    container_name: web_django
-  #    restart: always
-  #    depends_on:
-  #      - db
-  #    ports:
-  #      - "8000:8000"
+  web:
+    build: ./web
+    container_name: web
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
 
   db:
     image: mysql:8.0
