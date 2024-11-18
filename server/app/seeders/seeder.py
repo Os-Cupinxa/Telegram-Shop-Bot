@@ -20,19 +20,16 @@ fake = Faker("pt_BR")
 fake.add_provider(person)
 
 
-def populate_users():
-    data = []
-    for _ in range(10):
-        name = fake.name()
-        email = fake.email()
-        data.append((name, email))
+def add_test_user():
+    name = "Test User"
+    email = "test@email.com"
+    password = "$2b$12$EQ2g3.2Iu9Zy6IaEOjaEneUdtqURTexMSQj9debW7mgr/EHoStY9q"
 
-    query = "INSERT INTO users (name, email) VALUES (%s, %s)"
-
+    query = "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)"
     try:
-        cursor.executemany(query, data)
+        cursor.execute(query, (name, email, password))
         conn.commit()
-        print("Usuários inseridos com sucesso!")
+        print(f"Usuário {name} inserido com sucesso!")
     except mysql.connector.Error as err:
         print(f"Erro: {err}")
         conn.rollback()
@@ -158,7 +155,7 @@ def populate_order_item():
         conn.rollback()
 
 
-# populate_users()
+add_test_user()
 populate_categories()
 populate_products()
 populate_clients()
