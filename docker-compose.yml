@@ -37,6 +37,9 @@ services:
       - db
     ports:
       - "8000:8000"
+    environment:
+      SERVER_HOST: server
+      SERVER_PORT: 8001
 
   db:
     image: mysql:8.0

@@ -6,7 +6,6 @@ from django.contrib.auth.models import User  # Importe o modelo de usuário
 from .models import Product
 from django.contrib.auth import logout
 
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from .models import Product, Category  # Assumindo que temos um modelo Product e Category
@@ -17,10 +16,12 @@ from .models import Message
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 
-
 import httpx
 
-url = "http://localhost:8001/"
+from app.env_config import SERVER_URL
+
+url = f"{SERVER_URL}"
+
 
 async def login_view(request):
     token = request.COOKIES.get('access_token')
@@ -49,25 +50,25 @@ async def login_view(request):
     else:
         return render(request, 'login.html')
 
+
 def logout_view(request):
     # Realiza o logout do usuário
     logout(request)
 
     # Cria uma resposta de redirecionamento para a página de login
     response = redirect('login')
-    
 
     # Remove o cookie 'access_token'
     response.delete_cookie('access_token', path='/')
-    
 
     return response
+
 
 async def users_list(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     async with httpx.AsyncClient() as client:
@@ -79,15 +80,16 @@ async def users_list(request):
     else:
         return HttpResponse("Erro ao obter usuários", status=response.status_code)
 
+
 async def users_add(request):
     if request.method == 'POST':
         token = request.COOKIES.get('access_token')
         if not token:
             return redirect('login')
-        
+
         headers = {'Authorization': f'Bearer {token}'}
 
-        email  = request.POST.get('email')
+        email = request.POST.get('email')
         password = request.POST.get('password')
         username = request.POST.get('username')
 
@@ -106,13 +108,13 @@ async def users_add(request):
             return HttpResponse("Erro ao adicionar usuário", status=response.status_code)
     else:
         return render(request, 'main/users/add.html')
-    
+
 
 async def users_edit(request, id):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     if request.method == 'GET':
@@ -124,7 +126,7 @@ async def users_edit(request, id):
             return render(request, 'main/users/edit.html', {'user': user})
         else:
             return HttpResponse("Erro ao obter usuário", status=response.status_code)
-    
+
     if request.method == 'POST' and request.POST.get('_method') == 'PUT':
         user = request.POST
         dataUser = {
@@ -142,11 +144,12 @@ async def users_edit(request, id):
 
     return render(request, 'main/users/edit.html', {'user': user})
 
+
 async def users_delete(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
     if request.method == 'POST':
         user_id = request.POST.get('id')
@@ -167,22 +170,23 @@ async def products_list(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
-    
+
     async with httpx.AsyncClient() as client:
-        response = await client.get(url+"products/", headers=headers)
+        response = await client.get(url + "products/", headers=headers)
     if response.status_code == 200:
         products = response.json()
 
     return render(request, 'main/products/all.html', {'products': products})
+
 
 @csrf_exempt
 async def product_add(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     if request.method == 'GET':
@@ -204,7 +208,7 @@ async def product_add(request):
             "description": product.get('description'),
             "price": product.get('price')
         }
-        
+
         async with httpx.AsyncClient() as client:
             response = await client.post(url + "products/", json=dataProduct, headers=headers)
 
@@ -212,8 +216,8 @@ async def product_add(request):
             return redirect('products_list')
         else:
             return HttpResponse("Erro ao adicionar produto", status=response.status_code)
-    return render(request, 'main/products/add.html')    
-    
+    return render(request, 'main/products/add.html')
+
 
 async def product_edit(request, id):
     token = request.COOKIES.get('access_token')
@@ -237,7 +241,7 @@ async def product_edit(request, id):
             return render(request, 'main/products/edit.html', {'product': product})
         else:
             return HttpResponse("Erro ao obter produto", status=response.status_code)
-        
+
     if request.method == 'POST':
 
         name = request.POST.get('name')
@@ -260,15 +264,16 @@ async def product_edit(request, id):
             return redirect('products_list')
         else:
             return HttpResponse("Erro ao editar produto", status=response.status_code)
-        
+
     return render(request, 'main/products/edit.html', {'product': product})
+
 
 @csrf_exempt
 async def product_delete(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     if request.method == 'POST':
@@ -280,7 +285,7 @@ async def product_delete(request):
             return redirect('products_list')
         else:
             return HttpResponse("Erro ao deletar produto", status=response.status_code)
-        
+
     return redirect('products_list')
 
 
@@ -289,13 +294,14 @@ async def categories_list(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     async with httpx.AsyncClient() as client:
         headers = {'Authorization': f'Bearer {token}'}
-        response = await client.get(url+"categories/", headers=headers)
+        response = await client.get(url + "categories/", headers=headers)
     if response.status_code == 200:
         categories = response.json()
     return render(request, 'main/categories/all.html', {'categories': categories})
+
 
 async def category_add(request):
     # Resgatar o token do cookie
@@ -321,11 +327,12 @@ async def category_add(request):
 
     return render(request, 'main/categories/add.html')
 
+
 async def category_edit(request, id):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     if request.method == 'GET':
@@ -353,11 +360,12 @@ async def category_edit(request, id):
 
     return render(request, 'main/categories/edit.html', {'category': category})
 
+
 async def category_delete(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     if request.method == 'POST':
@@ -369,15 +377,16 @@ async def category_delete(request):
             return redirect('categories_list')
         else:
             return HttpResponse("Erro ao deletar categoria", status=response.status_code)
-        
+
     return redirect('categories_list')
+
 
 # clients views.py
 async def clients_list(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     async with httpx.AsyncClient() as client:
@@ -388,6 +397,7 @@ async def clients_list(request):
         return render(request, 'main/clients/all.html', {'clients': clients})
     else:
         return HttpResponse("Erro ao obter clientes", status=response.status_code)
+
 
 async def client_edit(request, id):
     token = request.COOKIES.get('access_token')
@@ -439,7 +449,6 @@ async def client_edit(request, id):
             "address": address,
             "is_active": active
         }
-        
 
         # Atualizar cliente na API
         async with httpx.AsyncClient() as client:
@@ -456,8 +465,8 @@ async def client_edit(request, id):
 
 
 # broadcast views.py7
-#@login_required
-#def broadcast(request):
+# @login_required
+# def broadcast(request):
 #    return render(request, 'main/broadcasts/add.html')
 
 # order views.py
@@ -465,28 +474,29 @@ async def orders_list(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url + "orders/", headers=headers)
-    
+
     if response.status_code == 200:
         orders = response.json()
 
     return render(request, 'main/orders/all.html', {'orders': orders})
+
 
 # @login_required
 # async def order_add(request):
 #     token = request.COOKIES.get('access_token')
 #     if not token:
 #         return redirect('login')
-    
+
 #     headers = {'Authorization': f'Bearer {token}'}
 
 
 #     if request.method == 'POST':
-        
+
 #         return redirect('orders_list')
 
 #     clients = Client.objects.all()
@@ -496,7 +506,7 @@ async def order_edit(request, id):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     if request.method == 'GET':
@@ -538,12 +548,13 @@ async def order_edit(request, id):
         else:
             return HttpResponse("Erro ao editar pedido", status=response.status_code)
 
+
 @login_required
 async def order_delete(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     if request.method == 'POST':
@@ -577,6 +588,7 @@ def messages_edit(request, id):
 
     return render(request, 'main/messages/edit.html', {'messages': message})
 
+
 # Deletar mensagem
 @login_required
 def messages_delete(request):
@@ -587,6 +599,3 @@ def messages_delete(request):
         return redirect('messages_list')
 
     return redirect('messages_list')
-
-
-
