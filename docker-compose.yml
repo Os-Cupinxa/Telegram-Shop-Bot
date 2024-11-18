@@ -41,7 +41,7 @@ services:
       SERVER_PORT: 8001
 
   db:
-    image: mysql:8.0
+    image: mysql:8.3
     container_name: mysql_server
     restart: always
     ports:
