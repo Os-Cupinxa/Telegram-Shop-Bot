@@ -1,13 +1,18 @@
+import os
 import random
 import mysql.connector
+from dotenv import load_dotenv
 from faker import Faker
 from faker.providers import person
 
+load_dotenv()
+
 conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="root",
-    database="telegramshopbot"
+    host=os.getenv("DATABASE_HOST"),
+    user=os.getenv("DATABASE_USER"),
+    password=os.getenv("DATABASE_PASSWORD"),
+    port=os.getenv("DATABASE_PORT"),
+    database=os.getenv("DATABASE_NAME")
 )
 cursor = conn.cursor()
 
