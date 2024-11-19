@@ -23,7 +23,6 @@ from registering import process_name, process_phone, process_city, process_addre
 
 nest_asyncio.apply()
 
-
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -32,18 +31,38 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    reply_keyboard = [
-        [InlineKeyboardButton("🛒 Carrinho", callback_data=f"go_to-cart"),
-         InlineKeyboardButton("📦 Catálogo", callback_data=f"go_to-catalogue"),
-         InlineKeyboardButton("🙋 Efetuar Login", callback_data=f"go_to-login")]
-    ]
 
-    start_text = (
-        "Olá! Seja bem-vindo à loja. Como posso ajudar?\n"
-        "Digite /ajuda para exibir a lista de comandos \n"
-        "ou selecione uma das opções abaixo\n"
-    )
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_info = context.user_data.get('user_info', {})
+
+    if user_info:
+        reply_keyboard = [
+            [
+                InlineKeyboardButton("🛒 Carrinho", callback_data=f"go_to-cart"),
+                InlineKeyboardButton("📦 Catálogo", callback_data=f"go_to-catalogue"),
+                InlineKeyboardButton("👤 Ver Conta", callback_data=f"go_to-profile")
+            ]
+        ]
+        start_text = (
+            f"Olá, {user_info.get('name', 'Usuário')}! Seja bem-vindo de volta à loja. 😊\n"
+            "Como posso ajudar hoje?\n"
+            "Digite /ajuda para exibir a lista de comandos \n"
+            "ou selecione uma das opções abaixo.\n"
+        )
+    else:
+        reply_keyboard = [
+            [
+                InlineKeyboardButton("🛒 Carrinho", callback_data=f"go_to-cart"),
+                InlineKeyboardButton("📦 Catálogo", callback_data=f"go_to-catalogue"),
+                InlineKeyboardButton("🙋 Efetuar Login", callback_data=f"go_to-login")
+            ]
+        ]
+        start_text = (
+            "Olá! Seja bem-vindo à loja. 😊\n"
+            "Você não está logado no momento.\n"
+            "Digite /ajuda para exibir a lista de comandos \n"
+            "ou selecione uma das opções abaixo.\n"
+        )
 
     await update.message.reply_text(
         start_text,
