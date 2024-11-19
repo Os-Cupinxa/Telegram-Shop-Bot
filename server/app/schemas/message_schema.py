@@ -19,6 +19,7 @@ class MessageResponse(MessageBase):
     id: int
     user_id: Optional[int] = None
     client_id: Optional[int] = None
+    status: str
 
     class Config:
         orm_mode = True
