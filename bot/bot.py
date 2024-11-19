@@ -14,7 +14,8 @@ from telegram.ext import (
 from account import log_in, check_user_by_cpf, choose_info_to_edit, show_user_info, update_name, update_phone, \
     update_city, update_address, edit_name, edit_phone, edit_city, edit_address
 from env_config import TELEGRAM_BOT_TOKEN
-from cart import show_cart, handle_quantity, add_to_cart, prompt_remove_item, confirm_remove_from_cart
+from cart import show_cart, handle_quantity, add_to_cart, prompt_remove_item, confirm_remove_from_cart, \
+    confirm_clean_cart
 from catalogue import show_catalogue_categories, get_products, navigate_product
 from chat import start_chat, save_message
 from checkout import checkout, confirm_order
@@ -195,6 +196,7 @@ async def main() -> None:
     application.add_handler(CallbackQueryHandler(get_order_details, pattern=r'see_order_details-.*'))
     application.add_handler(CallbackQueryHandler(prompt_remove_item, pattern=r'prompt_remove_item'))
     application.add_handler(CallbackQueryHandler(confirm_remove_from_cart, pattern=r'confirm_remove_item-.*'))
+    application.add_handler(CallbackQueryHandler(confirm_clean_cart, pattern=r'confirm_clean_cart'))
 
     application.add_handler(MessageHandler((filters.TEXT | filters.CONTACT) & ~filters.COMMAND, handle_input))
 
