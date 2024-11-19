@@ -44,7 +44,7 @@
         console.log("Desconectado do WebSocket");
     });
 
-    socket.on("new_message", (message) => {
+    socket.on("new_message_to_web", (message) => {
         console.log("Nova mensagem recebida:", message);
         addMessageToContainer(message);
     });
