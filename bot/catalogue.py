@@ -5,7 +5,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 from env_config import SERVER_URL
 
 
-async def show_catalogue_categories(query: Update.callback_query, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def show_catalogue_categories(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     url = f"{SERVER_URL}/categories/"
 
     async with httpx.AsyncClient() as client:
@@ -14,18 +14,31 @@ async def show_catalogue_categories(query: Update.callback_query, context: Conte
     categories_data = response.json()
 
     if response.status_code != 200:
-        await query.answer("Erro ao buscar categorias.")
+        error_message = "Erro ao buscar categorias. Por favor tente mais tarde!"
+
+        if update.callback_query:
+            await update.callback_query.message.reply_text(error_message)
+        else:
+            await update.message.reply_text(error_message)
         return
 
     if len(categories_data) > 0:
         keyboard = [
-            [InlineKeyboardButton(f"{category['emoji']} {category['name']}", callback_data=f"show_products-{category['id']}")]
+            [InlineKeyboardButton(f"{category['emoji']} {category['name']}",
+                                  callback_data=f"show_products-{category['id']}")]
             for category in categories_data
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text("Categorias:", reply_markup=reply_markup)
+
+        if update.callback_query:
+            await update.callback_query.message.reply_text("Categorias:", reply_markup=reply_markup)
+        else:
+            await update.message.reply_text("Categorias:", reply_markup=reply_markup)
     else:
-        await query.answer("Nenhuma categoria encontrada.")
+        if update.callback_query:
+            await update.callback_query.message.reply_text("Nenhuma categoria encontrada.")
+        else:
+            await update.message.reply_text("Nenhuma categoria encontrada.")
 
 
 async def get_products(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

@@ -77,7 +77,7 @@ async def go_to(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     page = query.data.split("-")[1]
 
     if page == "catalogue":
-        await show_catalogue_categories(query, context)
+        await show_catalogue_categories(update, context)
 
     elif page == "cart":
         await show_cart(update, context)
@@ -182,6 +182,7 @@ async def main() -> None:
     application.add_handler(CommandHandler("iniciar", start))
     application.add_handler(CommandHandler("cancelar", cancel))
     application.add_handler(CommandHandler("carrinho", show_cart))
+    application.add_handler(CommandHandler("catalogo", show_catalogue_categories))
     application.add_handler(CommandHandler("chat", start_chat))
     application.add_handler(CommandHandler("conta", show_user_info))
     application.add_handler(CommandHandler("ajuda", help_command))
