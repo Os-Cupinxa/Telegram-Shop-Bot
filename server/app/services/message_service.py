@@ -23,7 +23,6 @@ def get_message(db: Session, message_id: int):
 
 
 async def create_message(db: Session, message: MessageCreate):
-    print(f"Creating message: {message}")
     if message.client_id is None:
         user = get_object_by_id(db, User, message.user_id, "User not found")
     else:
@@ -72,18 +71,34 @@ async def send_to_bot(db_message: Message, name: str):
         response = await client.post(TELEGRAM_API_URL, params=payload)
         if response.status_code == 200:
             print(f"Message successfully sent to chat_id {chat_id}")
+            print(f"\033[92mINFO:\033[0m     Message successfully sent to chat_id {chat_id}")
         else:
-            print(f"Failed to send message. Status code: {response.status_code}, Response: {response.text}")
+            print(f"\033[91mERROR:\033[0m    Failed to send message. Status code: "
+                  f"{response.status_code}, Response: {response.text}")
 
 
 async def send_to_client(db_message: Message, client: Client):
     from app.main import sio
-    
-    print(f"Message sent to client: {client}")
+
+    client_data = {
+        "id": client.id,
+        "name": client.name,
+        "cpf": client.cpf,
+        "phone_number": client.phone_number,
+        "city": client.city,
+        "address": client.address,
+        "is_active": client.is_active
+    }
+
+    created_date_str = db_message.created_date.isoformat()
+
+    print(f"Message sent to client: {client_data}")
     await sio.emit("new_message_to_web", {
+        "id": db_message.id,
         "chat_id": db_message.chat_id,
         "message": db_message.message,
-        "client": client
+        "created_date": created_date_str,
+        "client": client_data
     })
 
 
