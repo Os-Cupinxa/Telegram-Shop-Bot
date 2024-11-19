@@ -31,14 +31,14 @@ async def show_catalogue_categories(update: Update, context: ContextTypes.DEFAUL
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         if update.callback_query:
-            await update.callback_query.message.reply_text("Categorias:", reply_markup=reply_markup)
+            await update.callback_query.message.reply_text("Selecione a categoria:", reply_markup=reply_markup)
         else:
-            await update.message.reply_text("Categorias:", reply_markup=reply_markup)
+            await update.message.reply_text("Selecione a categoria:", reply_markup=reply_markup)
     else:
         if update.callback_query:
-            await update.callback_query.message.reply_text("Nenhuma categoria encontrada.")
+            await update.callback_query.message.reply_text("Sinto muito, categoria encontrada.")
         else:
-            await update.message.reply_text("Nenhuma categoria encontrada.")
+            await update.message.reply_text("Sinto muito, categoria encontrada.")
 
 
 async def get_products(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
