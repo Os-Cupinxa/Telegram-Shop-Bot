@@ -6,6 +6,16 @@ from env_config import SERVER_URL
 
 
 async def start_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    is_chat_active = context.user_data.get('awaiting_chat_inputs', {})
+
+    if is_chat_active:
+        context.user_data["awaiting_chat_inputs"] = False
+        await update.message.reply_text(
+            "✅ *Conversa com atendente encerrada!*",
+            parse_mode="Markdown"
+        )
+        return
+
     user_info = context.user_data.get('user_info', {})
 
     if not user_info:
@@ -18,7 +28,12 @@ async def start_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         return
 
     context.user_data["awaiting_chat_inputs"] = True
-    await update.message.reply_text("Conversa iniciada")
+    await update.message.reply_text(
+        "✅ *Conversa com atendente iniciada!*\n\n"
+        "📩 Agora você pode enviar suas mensagens.\n"
+        "❗ Para encerrar a conversa, basta enviar o comando */chat* novamente.",
+        parse_mode="Markdown"
+    )
 
 
 async def save_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
