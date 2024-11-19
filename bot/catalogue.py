@@ -1,5 +1,7 @@
 import httpx
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+import requests
+from io import BytesIO
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputFile
 from telegram.ext import ContextTypes, ConversationHandler
 
 from env_config import SERVER_URL
@@ -73,11 +75,19 @@ async def display_product(query: Update.callback_query, context: ContextTypes.DE
 
     product = products[current_index]
 
+    try:
+        response = requests.get(product['photo_url'], timeout=10)
+        response.raise_for_status()
+        image = BytesIO(response.content)
+        image.name = "product.jpg"
+    except requests.RequestException as e:
+        await query.message.reply_text(f"Erro ao carregar a imagem: {e}")
+        return
+
     product_text = (
         f"📦 *Nome:* {product['name']}\n"
         f"📝 *Descrição:* {product['description']}\n"
         f"💵 *Preço:* R$ {product['price']:.2f}\n"
-        f"[Imagem]({product['photo_url']})"
     )
 
     navigation_buttons = []
@@ -99,7 +109,13 @@ async def display_product(query: Update.callback_query, context: ContextTypes.DE
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await query.edit_message_text(product_text, reply_markup=reply_markup, parse_mode='Markdown')
+    await query.message.delete()
+    await query.message.reply_photo(
+        photo=InputFile(image),
+        caption=product_text,
+        reply_markup=reply_markup,
+        parse_mode='Markdown'
+    )
 
 
 async def navigate_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -115,5 +131,4 @@ async def navigate_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     context.user_data['current_product_index'] = current_index
 
-    await display_product(update.callback_query, context)
     await display_product(query, context)
