@@ -45,8 +45,8 @@ async def handle_quantity(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             f"Adicionado ao carrinho:\n"
             f"**Produto:** {product['name']}\n"
             f"**Quantidade:** {quantity}\n"
-            f"**Valor unitário:** R${unit_price:.2f}\n"
-            f"**Total:** R${total_price:.2f}"
+            f"**Valor unitário:** R$ {unit_price:.2f}\n"
+            f"**Total:** R$ {total_price:.2f}"
         )
         await update.message.reply_text(confirmation_message, parse_mode='Markdown')
 
@@ -92,12 +92,12 @@ async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         cart_message += (
             f"🛍️ *Produto:* {product['name']}\n"
             f"🔢 *Quantidade:* {quantity}\n"
-            f"💵 *Valor unitário:* R${unit_price:.2f}\n"
-            f"💰 *Total:* R${total_price:.2f}\n"
+            f"💵 *Valor unitário:* R$ {unit_price:.2f}\n"
+            f"💰 *Total:* R$ {total_price:.2f}\n"
             f"--------------------------------------------------\n"
         )
 
-    cart_message += f"🛒 *Total do carrinho:* R${total_cart_value:.2f}"
+    cart_message += f"🛒 *Total do carrinho:* R$ {total_cart_value:.2f}"
 
     keyboard = [
         [InlineKeyboardButton("🛒 Finalizar pedido", callback_data="go_to-checkout"),
@@ -124,7 +124,7 @@ async def prompt_remove_item(update: Update, context: ContextTypes.DEFAULT_TYPE)
     keyboard = [
         [
             InlineKeyboardButton(
-                f"❌ {item['product']['name']} - {item['quantity']}x (R${item['quantity'] * item['product']['price']:.2f})",
+                f"❌ {item['product']['name']} - {item['quantity']}x (R$ {item['quantity'] * item['product']['price']:.2f})",
                 callback_data=f"confirm_remove_item-{item['product_id']}"
             )
         ]

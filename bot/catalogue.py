@@ -76,7 +76,7 @@ async def display_product(query: Update.callback_query, context: ContextTypes.DE
     product_text = (
         f"📦 *Nome:* {product['name']}\n"
         f"📝 *Descrição:* {product['description']}\n"
-        f"💵 *Preço:* R${product['price']:.2f}\n"
+        f"💵 *Preço:* R$ {product['price']:.2f}\n"
         f"[Imagem]({product['photo_url']})"
     )
 
