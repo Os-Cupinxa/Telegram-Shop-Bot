@@ -202,7 +202,7 @@ async def product_add(request):
     if request.method == "POST":
         product = request.POST
         dataProduct = {
-            "category_id": 1,
+            "category_id": product.get('category'),
             "photo_url": product.get('photo'),
             "name": product.get('name'),
             "description": product.get('description'),
@@ -487,21 +487,6 @@ async def orders_list(request):
     return render(request, 'main/orders/all.html', {'orders': orders})
 
 
-# @login_required
-# async def order_add(request):
-#     token = request.COOKIES.get('access_token')
-#     if not token:
-#         return redirect('login')
-
-#     headers = {'Authorization': f'Bearer {token}'}
-
-
-#     if request.method == 'POST':
-
-#         return redirect('orders_list')
-
-#     clients = Client.objects.all()
-#     return render(request, 'main/orders/add.html', {'clients': clients})
 
 async def order_edit(request, id):
     token = request.COOKIES.get('access_token')
@@ -567,18 +552,26 @@ async def order_edit(request, id):
 
 
 
-
-
 # Exibição da lista de mensagens
-@login_required
-def messages_list(request):
-    messages_list = Message.objects.all()
-    return render(request, 'main/messages/all.html', {'messages': messages_list})
+async def messages_list(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+    
+    headers = {'Authorization': f'Bearer {token}'}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url + "messages/", headers=headers)
+
+    if response.status_code == 200:
+        messages = response.json()
+        print(messages)
+        return render(request, 'main/messages/all.html', {'messages': messages})
+    
+    return HttpResponse("Erro ao obter mensagens", status=response.status_code)
 
 
 # Editar mensagem existente
-@login_required
-@csrf_exempt
 def messages_edit(request, id):
     message = get_object_or_404(Message, id=id)
 
@@ -590,14 +583,3 @@ def messages_edit(request, id):
 
     return render(request, 'main/messages/edit.html', {'messages': message})
 
-
-# Deletar mensagem
-@login_required
-def messages_delete(request):
-    if request.method == 'POST':
-        message_id = request.POST.get('id')
-        message = get_object_or_404(Message, id=message_id)
-        message.delete()
-        return redirect('messages_list')
-
-    return redirect('messages_list')

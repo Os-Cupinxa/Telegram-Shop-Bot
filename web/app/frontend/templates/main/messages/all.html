@@ -7,8 +7,8 @@
     <thead>
         <tr>
             <th>Id</th>
-            <th>Description</th>
-            <th>Text</th>
+            <th>Mensagem</th>
+            <th>created_date</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -16,8 +16,8 @@
         {% for message in messages %}
         <tr>
             <td>{{ message.id }}</td>
-            <td>{{ message.description|default:'' }}</td>
-            <td>{{ message.text }}</td>
+            <td>{{ message.message|default:'' }}</td>
+            <td>{{ message.created_date }}</td>
             <td>
                 <a class="btn btn-xs btn-info command-edit" href="{% url 'messages_edit' message.id %}">
                     <i class="fa fa-pencil" aria-hidden="true"></i>
