@@ -18,8 +18,9 @@
       <div class="form-group row">
         <label class="col-sm-2">Client:</label>
         <div class="col-sm-10">
-          <input type="hidden" name="client" value="{{ order.client_id }}">
-          {{ order.client_id }} (<a target="_blank" href="{% url 'client_edit' order.client_id %}">view</a>)
+          <input type="hidden" name="client_id" value="{{ order.client.id }}">
+          <input type="hidden" name="client" value="{{ order.client.name }}">
+          {{ order.client.name }} (<a target="_blank" href="{% url 'client_edit' order.client_id %}">view</a>)
         </div>
       </div>
 
@@ -35,11 +36,9 @@
         <label class="col-sm-2">Status:</label>
         <div class="col-sm-10">
           <select class="form-control" name="status">
-            {% for status in order_status_choices %}
-              <option value="{{ status.0 }}" {% if order.status == status.0 %}selected{% endif %}>
-                {{ status.1 }}
-              </option>
-            {% endfor %}
+            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Completed</option>
+            <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
           </select>
         </div>
       </div>
@@ -59,12 +58,6 @@
 
     <form method="get" action="{% url 'orders_list' %}">
       <button class="btn btn-info" type="submit">Back</button>
-    </form>
-
-    <form method="post" action="{% url 'order_delete' %}">
-      {% csrf_token %}
-      <input type="hidden" name="id" value="{{ order.id }}">
-      <button class="btn btn-danger" type="submit">Delete</button>
     </form>
 
   {% else %}

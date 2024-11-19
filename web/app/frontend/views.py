@@ -482,6 +482,7 @@ async def orders_list(request):
 
     if response.status_code == 200:
         orders = response.json()
+    
 
     return render(request, 'main/orders/all.html', {'orders': orders})
 
@@ -525,46 +526,47 @@ async def order_edit(request, id):
                 order['items'] = items_response.json()  # Adiciona os itens ao pedido
             else:
                 order['items'] = []  # Caso dê erro, atribuir lista vazia
-
+            
+            
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url + "clients/"+str(order['client_id']), headers=headers)
+            
+            if response.status_code == 200:
+                clientRequest = response.json()
+                order['client'] = clientRequest
             return render(request, 'main/orders/edit.html', {'order': order})
         else:
             return HttpResponse("Erro ao obter pedido", status=response.status_code)
 
-    if request.method == 'POST' and request.POST.get('_method') == 'PUT':
-        # Extrair dados do formulário enviado
-        order = request.POST
+    if request.method == 'POST':
+        items = []
+        for i in range(len(request.POST.getlist('items[0].id'))):
+            item = {
+                "product_id": request.POST.get(f'items[{i}].product_id'),
+                "quantity": request.POST.get(f'items[{i}].quantity'),
+            }
+            items.append(item)
+
         dataOrder = {
-            "client_id": order.get('client_id'),
-            "amount": order.get('amount'),
-            "status": order.get('status'),
-            "items": json.loads(order.get('items', '[]')),  # Garante que itens seja uma lista válida
+            "client_id": request.POST.get('client_id'),
+            "amount": request.POST.get('amount'),
+            "status": request.POST.get('status'),
+            "items": items,
         }
 
+        print(dataOrder)
+
         async with httpx.AsyncClient() as client:
-            response = await client.put(url + f"orders/{id}", json=dataOrder, headers=headers)
+            response = await client.put(url + f"orders/?order_id={id}", json=dataOrder, headers=headers)
 
         if response.status_code == 200:
             return redirect('orders_list')
         else:
             return HttpResponse("Erro ao editar pedido", status=response.status_code)
+    return render(request, 'main/orders/edit.html', {'order': order})
 
 
-@login_required
-async def order_delete(request):
-    token = request.COOKIES.get('access_token')
-    if not token:
-        return redirect('login')
 
-    headers = {'Authorization': f'Bearer {token}'}
-
-    if request.method == 'POST':
-        order_id = request.POST.get('id')
-        async with httpx.AsyncClient() as client:
-            response = await client.delete(url + f"orders/{order_id}", headers=headers)
-
-        if response.status_code == 200:
-            return redirect('orders_list')
-    return redirect('orders_list')
 
 
 # Exibição da lista de mensagens
