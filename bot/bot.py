@@ -159,6 +159,7 @@ async def main() -> None:
 
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
+    application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("iniciar", start))
     application.add_handler(CommandHandler("cancelar", cancel))
     application.add_handler(CommandHandler("carrinho", show_cart))
