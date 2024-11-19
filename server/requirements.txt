@@ -5,6 +5,7 @@ httpx
 passlib
 python-dotenv
 python-jose
+python-multipart
 python-socketio
 fastapi-socketio
 bcrypt
