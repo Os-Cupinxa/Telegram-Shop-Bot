@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 
 from app.config.database import Base
 
-
 class Message(Base):
     __tablename__ = "messages"
 
@@ -11,6 +10,7 @@ class Message(Base):
     chat_id = Column(BigInteger, nullable=False)
     created_date = Column(TIMESTAMP(timezone=False), nullable=False)
     message = Column(Text, nullable=False)
+    status = Column(String(50), nullable=True, default='unread') # Novo campo de status
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     client_id = Column(Integer, ForeignKey("clients.id"), nullable=True)
@@ -22,3 +22,4 @@ class Message(Base):
         super().__init__(**kwargs)
         if not (self.user_id or self.client_id):
             raise ValueError("Message must be related to either a user or a client.")
+

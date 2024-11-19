@@ -552,12 +552,12 @@ async def order_edit(request, id):
 
 
 
-# Exibição da lista de mensagens
+# Exibição da lista de mensagens (via HTTP)
 async def messages_list(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     async with httpx.AsyncClient() as client:
@@ -567,8 +567,12 @@ async def messages_list(request):
         messages = response.json()
         print(messages)
         return render(request, 'main/messages/all.html', {'messages': messages})
-    
+
     return HttpResponse("Erro ao obter mensagens", status=response.status_code)
+
+
+
+
 
 
 # Editar mensagem existente

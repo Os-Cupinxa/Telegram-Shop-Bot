@@ -19,9 +19,26 @@ def read_message(message_id: int, db: Session = Depends(get_db), current_user: i
     return message_service.get_message(db, message_id)
 
 
+async def create_message(db, message):
+    db_message = await message_service.create_message(db, message)
+    return db_message
+
+
+
 @router.post("/messages/", response_model=MessageResponse, tags=["Messages"])
-def create_message(message: MessageCreate, db: Session = Depends(get_db)):
-    return message_service.create_message(db, message)
+async def create_message_endpoint(message: MessageCreate, db: Session = Depends(get_db)):
+    from app.main import notify_new_message
+
+    print(f"Creating message: {message}")
+    # Chama o serviço para salvar a mensagem no banco de dados
+    db_message = await create_message(db, message)
+
+    print(f"Message created: {db_message}")
+
+    # Notifica os clientes conectados via WebSocket
+    notify_new_message(db_message)
+
+    return db_message
 
 
 @router.put("/messages/", response_model=MessageResponse, tags=["Messages"])

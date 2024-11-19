@@ -8,6 +8,7 @@ from app.controllers import (user_controller,
                              client_controller,
                              message_controller, auth_controller)
 
+
 Base.metadata.create_all(bind=engine)
 
 tags_metadata = [
@@ -63,5 +64,17 @@ async def message(sid, data):
     print(f"Message from {sid}: {data}")
     await sio.emit("response", {"message": "Message received!"})
 
+@sio.event
+def notify_new_message(db_message):
+    print(f"New message: {db_message}")
+    sio.emit("new_message", {
+        "id": db_message.id,
+        "chat_id": db_message.chat_id,
+        "message": db_message.message,
+        "status": db_message.status,
+        "created_date": str(db_message.created_date),
+        "client_id": db_message.client_id,
+        "user_id": db_message.user_id
+    })
 
 app.mount("/socket.io", socket_app)

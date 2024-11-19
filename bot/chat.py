@@ -33,5 +33,11 @@ async def save_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "client_id": client_id,
     }
 
+    print(user_info)
+
+    print(f"Sending message to server: {new_message_data}") 
+
     async with httpx.AsyncClient() as client:
         await client.post(f"{SERVER_URL}/messages/", json=new_message_data)
+
+    print(f"Message sent to server")

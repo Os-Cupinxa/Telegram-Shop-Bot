@@ -22,7 +22,8 @@ def get_message(db: Session, message_id: int):
     return db_message
 
 
-def create_message(db: Session, message: MessageCreate):
+async def create_message(db: Session, message: MessageCreate):
+    print(f"Creating message: {message}")
     if message.client_id is None:
         user = get_object_by_id(db, User, message.user_id, "User not found")
     else:
@@ -42,8 +43,7 @@ def create_message(db: Session, message: MessageCreate):
     if message.client_id is None:
         asyncio.run(send_to_bot(db_message, user.name))
     else:
-        asyncio.run(send_to_client(db_message, client))
-
+        await send_to_client(db_message, client)
     return db_message
 
 
@@ -78,6 +78,8 @@ async def send_to_bot(db_message: Message, name: str):
 
 async def send_to_client(db_message: Message, client: Client):
     from app.main import sio
+    
+    print(f"Message sent to client: {client}")
     await sio.emit("new_message_to_web", {
         "chat_id": db_message.chat_id,
         "message": db_message.message,

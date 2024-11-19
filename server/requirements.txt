@@ -12,3 +12,5 @@ pydantic
 mysql-connector-python
 faker
 faker[providers]
+sio
+python-socketio
