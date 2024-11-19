@@ -163,6 +163,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "🔹 /iniciar - Iniciar a conversa\n"
         "🔹 /cancelar - Cancelar a conversa\n"
         "🔹 /carrinho - Ver seu carrinho de compras\n"
+        "🔹 /catalogo - Exibir o catálogo da loja\n"
         "🔹 /chat - Iniciar conversa com atendente\n"
         "🔹 /conta - Ver informações da sua conta\n"
         "🔹 /ajuda - Mostrar esta lista de comandos\n"
