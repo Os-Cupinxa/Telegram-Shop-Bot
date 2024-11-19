@@ -42,12 +42,9 @@ async def handle_quantity(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             cart.append({'product_id': product['id'], 'quantity': quantity, 'product': product})
 
         confirmation_message = (
-            f"Adicionado ao carrinho:\n"
-            f"**Produto:** {product['name']}\n"
-            f"**Quantidade:** {quantity}\n"
-            f"**Valor unitário:** R$ {unit_price:.2f}\n"
-            f"**Total:** R$ {total_price:.2f}"
+            f"➕ *{quantity} x {product['name']}* adicionados ao carrinho por R$ {total_price:.2f}!"
         )
+
         await update.message.reply_text(confirmation_message, parse_mode='Markdown')
 
         context.user_data['awaiting_quantity'] = False
