@@ -31,7 +31,8 @@ def create_client(db: Session, client: ClientCreate):
         cpf=client.cpf,
         phone_number=client.phone_number,
         city=client.city,
-        address=client.address
+        address=client.address,
+        chat_id=client.chat_id,
     )
 
     db.add(db_client)

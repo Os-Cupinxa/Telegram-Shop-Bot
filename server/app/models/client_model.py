@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, BigInteger
 from sqlalchemy.orm import relationship
 from app.config.database import Base
 
@@ -13,6 +13,7 @@ class Client(Base):
     city = Column(String(255))
     address = Column(String(255))
     is_active = Column(Boolean, nullable=False, default=True)
+    chat_id = Column(BigInteger, nullable=False)
 
     orders = relationship("Order", back_populates="client")
     messages = relationship("Message", back_populates="client", lazy="select")
