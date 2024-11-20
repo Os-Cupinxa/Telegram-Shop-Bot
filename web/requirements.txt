@@ -2,3 +2,4 @@ django
 httpx
 python-dotenv
 fastapi
+requests
