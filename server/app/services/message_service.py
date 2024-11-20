@@ -65,7 +65,6 @@ async def create_message(db: Session, message: MessageCreate):
         user_id=message.user_id,
         client_id=message.client_id
     )
-    print(db_message)
     db.add(db_message)
     db.commit()
     db.refresh(db_message)
