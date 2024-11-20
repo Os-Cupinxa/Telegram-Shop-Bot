@@ -39,10 +39,6 @@ urlpatterns = [
     path('orders/', views.orders_list, name='orders_list'),
     path('orders/edit/<int:id>/', views.order_edit, name='order_edit'),
     
-    # Message paths
-    path('messages/', views.messages_list, name='messages_list'),
-    path('messages/edit/<int:id>/', views.messages_edit, name='messages_edit'),
-
     # Conversations path
     path('conversations/', views.conversations_list, name='conversations_list'),
     path('conversations/<int:chat_id>/', views.conversation_messages, name='conversation_messages'),

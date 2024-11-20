@@ -68,13 +68,9 @@ async def login_view(request):
 
 
 def logout_view(request):
-    # Realiza o logout do usuário
     logout(request)
-
-    # Cria uma resposta de redirecionamento para a página de login
     response = redirect('login')
 
-    # Remove o cookie 'access_token'
     response.delete_cookie('access_token', path='/')
 
     return response
@@ -418,11 +414,10 @@ async def clients_list(request):
 async def client_edit(request, id):
     token = request.COOKIES.get('access_token')
     if not token:
-        return redirect('login')  # Certifique-se de que 'login' é uma rota válida.
+        return redirect('login') 
 
     headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
 
-    # Lidar com requisições GET
     if request.method == 'GET':
         async with httpx.AsyncClient() as client:
             response = await client.get(url + f"clients/{id}", headers=headers)
@@ -479,11 +474,6 @@ async def client_edit(request, id):
 
     return HttpResponse("Method not allowed", status=405)
 
-
-# broadcast views.py7
-# @login_required
-# def broadcast(request):
-#    return render(request, 'main/broadcasts/add.html')
 
 # order views.py
 async def orders_list(request):
@@ -637,39 +627,8 @@ def mark_conversation_as_read(request, chat_id):
 
 
 
-# Exibição da lista de mensagens (via HTTP)
-async def messages_list(request):
-    token = request.COOKIES.get('access_token')
-    if not token:
-        return redirect('login')
 
-    headers = {'Authorization': f'Bearer {token}'}
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url + "messages/", headers=headers)
-
-    if response.status_code == 200:
-        messages = response.json()
-        print(messages)
-        return render(request, 'main/messages/all.html', {'messages': messages})
-
-    return HttpResponse("Erro ao obter mensagens", status=response.status_code)
-
-
-# Editar mensagem existente
-def messages_edit(request, id):
-    message = get_object_or_404(Message, id=id)
-
-    if request.method == 'POST':
-        message.description = request.POST.get('description')
-        message.text = request.POST.get('text')
-        message.save()
-        return redirect('messages_list')
-
-    return render(request, 'main/messages/edit.html', {'messages': message})
-
-
-
+# broadcast views.py
 async def broadcast_message(request):
     token = request.COOKIES.get('access_token')
     if not token:
