@@ -9,6 +9,7 @@ class ClientBase(BaseModel):
     phone_number: str
     city: str
     address: str
+    chat_id: int
     is_active: Optional[bool] = True
 
 class ClientCreate(ClientBase):
@@ -19,4 +20,4 @@ class ClientResponse(ClientBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

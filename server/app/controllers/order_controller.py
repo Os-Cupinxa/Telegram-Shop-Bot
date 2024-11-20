@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.schemas.order_schema import OrderCreate, OrderResponse, OrderItemBase, OrderItemResponse
+from app.schemas.order_schema import OrderCreate, OrderResponse, OrderItemBase, OrderItemResponse, OrderUpdate
 from app.services import order_service
 from app.config.database import get_db
 from app.utils.access_token import get_current_user
@@ -35,8 +35,8 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/orders/", response_model=OrderResponse, tags=["Orders"])
-def update_order(order_id: int, order: OrderCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
-    return order_service.update_order(db, order_id, order)
+async def update_order(order_id: int, order: OrderUpdate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    return await order_service.update_order(db, order_id, order)
 
 
 @router.delete("/orders/{order_id}", tags=["Orders"])

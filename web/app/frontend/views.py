@@ -17,6 +17,10 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 
 import httpx
+import asyncio
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from app.env_config import SERVER_URL
 
@@ -30,16 +34,21 @@ async def login_view(request):
 
     if request.method == 'GET':
         return render(request, 'login.html')
-
     username = request.POST.get('username')
     password = request.POST.get('password')
-    dataUser = {
-        "email": username,
-        "password": password
+
+    formData = httpx.QueryParams({
+        'grant_type': 'password',
+        'username': username,
+        'password': password
+    })
+
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.post(url + "login/", json=dataUser)
+        response = await client.post(url + "login/", headers=headers, content=formData)
 
     if response.status_code == 200:
         # Salvar o token de autenticação de acess token no cookie
@@ -49,6 +58,14 @@ async def login_view(request):
         return redirect_response
     else:
         return render(request, 'login.html')
+
+
+
+def sync_login_view(request):
+    return asyncio.run(login_view(request))
+
+# Atualize suas URLs para usar sync_login_view em vez de login_view
+
 
 
 def logout_view(request):
@@ -550,14 +567,83 @@ async def order_edit(request, id):
             return HttpResponse("Erro ao editar pedido", status=response.status_code)
     return render(request, 'main/orders/edit.html', {'order': order})
 
+async def conversations_list(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+
+    headers = {'Authorization': f'Bearer {token}'}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url + "conversations/", headers=headers)
+
+    if response.status_code == 200:
+        conversations = response.json()
+        return render(request, 'main/messages/conversations.html', {'conversations': conversations})
+
+    return HttpResponse("Erro ao obter conversas", status=response.status_code)
+
+async def conversation_messages(request, chat_id):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+
+    headers = {'Authorization': f'Bearer {token}'}
+
+    if request.method == 'POST':
+        message_text = request.POST.get('message')
+        user_id = request.COOKIES.get('user_id')  # Ou obtenha do token
+
+        message_data = {
+            "chat_id": chat_id,
+            "message": message_text,
+            "user_id": 1,
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url + "messages/", json=message_data, headers=headers)
+
+        if response.status_code == 200:
+            # Redireciona para a mesma página para exibir as mensagens atualizadas
+            return redirect('conversation_messages', chat_id=chat_id)
+        else:
+            return HttpResponse("Erro ao enviar mensagem", status=response.status_code)
+
+    # Requisição GET: obter mensagens
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url + f"messages/?chat_id={chat_id}", headers=headers)
+
+    if response.status_code == 200:
+        messages = response.json()
+        return render(request, 'main/messages/conversation_messages.html', {'messages': messages, 'chat_id': chat_id})
+
+    return HttpResponse("Erro ao obter mensagens", status=response.status_code)
+
+@csrf_exempt
+def mark_conversation_as_read(request, chat_id):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return JsonResponse({"error": "Usuário não autenticado"}, status=401)
+
+    headers = {'Authorization': f'Bearer {token}'}
+
+    if request.method == 'POST':
+        response = requests.post(f"{url}conversations/{chat_id}/mark_as_read", headers=headers)
+        if response.status_code == 200:
+            return JsonResponse({"message": "Conversa marcada como lida"})
+        else:
+            return JsonResponse({"error": "Erro ao marcar conversa como lida"}, status=response.status_code)
+    else:
+        return JsonResponse({"error": "Método não permitido"}, status=405)
 
 
-# Exibição da lista de mensagens
+
+# Exibição da lista de mensagens (via HTTP)
 async def messages_list(request):
     token = request.COOKIES.get('access_token')
     if not token:
         return redirect('login')
-    
+
     headers = {'Authorization': f'Bearer {token}'}
 
     async with httpx.AsyncClient() as client:
@@ -567,7 +653,7 @@ async def messages_list(request):
         messages = response.json()
         print(messages)
         return render(request, 'main/messages/all.html', {'messages': messages})
-    
+
     return HttpResponse("Erro ao obter mensagens", status=response.status_code)
 
 
@@ -583,3 +669,26 @@ def messages_edit(request, id):
 
     return render(request, 'main/messages/edit.html', {'messages': message})
 
+
+
+async def broadcast_message(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+
+    headers = {'Authorization': f'Bearer {token}'}
+
+    if request.method == 'POST':
+        message_text = request.POST.get('message')
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url + "broadcast/?message="+message_text, headers=headers)
+
+        if response.status_code == 200:
+            messages.success(request, 'Mensagem enviada com sucesso para todos os clientes.')
+            return redirect('broadcast')
+        else:
+            messages.error(request, 'Erro ao enviar mensagem de broadcast.')
+            return HttpResponse("Erro ao enviar mensagem de broadcast", status=response.status_code)
+
+    return render(request, 'main/broadcasts/broadcast.html')

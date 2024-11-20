@@ -5,6 +5,7 @@ httpx
 passlib
 python-dotenv
 python-jose
+python-multipart
 python-socketio
 fastapi-socketio
 bcrypt
@@ -12,3 +13,5 @@ pydantic
 mysql-connector-python
 faker
 faker[providers]
+sio
+python-socketio

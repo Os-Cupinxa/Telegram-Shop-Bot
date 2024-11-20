@@ -11,7 +11,7 @@ class OrderItemBase(BaseModel):
     quantity: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class OrderItemResponse(BaseModel):
@@ -30,9 +30,13 @@ class OrderCreate(OrderBase):
     items: List[OrderItemBase]
 
 
+class OrderUpdate(OrderBase):
+    pass
+
+
 class OrderResponse(OrderBase):
     id: int
     created_date: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -38,9 +38,9 @@ async def show_catalogue_categories(update: Update, context: ContextTypes.DEFAUL
             await update.message.reply_text("Selecione a categoria:", reply_markup=reply_markup)
     else:
         if update.callback_query:
-            await update.callback_query.message.reply_text("Sinto muito, categoria encontrada.")
+            await update.callback_query.message.reply_text("Sinto muito, nenhuma categoria encontrada.")
         else:
-            await update.message.reply_text("Sinto muito, categoria encontrada.")
+            await update.message.reply_text("Sinto muito, nenhuma categoria encontrada.")
 
 
 async def get_products(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

@@ -1,0 +1,96 @@
+{% extends 'common/home.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/conversations.css' %}">
+
+<h1>Conversas Ativas</h1>
+
+<div id="conversations-container">
+    {% for conversation in conversations %}
+    <div class="conversation-item {% if conversation.status == 'unread' %}unread{% endif %}"
+        data-chat-id="{{ conversation.chat_id }}">
+        <div class="conversation-info">
+            <h4>{{ conversation.client_name|default:'Cliente Desconhecido' }}</h4>
+            <p>{{ conversation.last_message|truncatewords:10 }}</p>
+        </div>
+        <div class="conversation-timestamp">
+            <span>{{ conversation.last_message_date|date:"d/m/Y H:i" }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+<script>
+    const socket = io("http://localhost:8001"); // Substitua pela URL do backend
+
+    socket.on("connect", () => {
+        console.log("Conectado ao WebSocket");
+    });
+    socket.on("disconnect", () => {
+        console.log("Desconectado do WebSocket");
+    });
+
+    socket.on("new_message_to_web", (message) => {
+        updateConversationItem(message);
+    });
+
+    socket.on("conversation_marked_as_read", (data) => {
+        let conversationItem = document.querySelector(`.conversation-item[data-chat-id='${data.chat_id}']`);
+        if (conversationItem) {
+            conversationItem.classList.remove('unread');
+        }
+    });
+
+
+    function updateConversationItem(message) {
+        const container = document.getElementById("conversations-container");
+        let conversationItem = document.querySelector(`.conversation-item[data-chat-id='${message.chat_id}']`);
+
+        if (conversationItem) {
+            // Atualiza a última mensagem e timestamp
+            conversationItem.querySelector('.conversation-info p').textContent = message.message;
+            conversationItem.querySelector('.conversation-timestamp span').textContent = new Date(message.created_date).toLocaleString();
+            conversationItem.classList.add('unread');
+        } else {
+            // Cria um novo item de conversa
+            conversationItem = document.createElement('div');
+            conversationItem.classList.add('conversation-item', 'unread');
+            conversationItem.dataset.chatId = message.chat_id;
+
+            conversationItem.innerHTML = `
+            <div class="conversation-info">
+                <h4>${message.client ? message.client.name : 'Cliente Desconhecido'}</h4>
+                <p>${message.message}</p>
+            </div>
+            <div class="conversation-timestamp">
+                <span>${new Date(message.created_date).toLocaleString()}</span>
+            </div>
+        `;
+
+            container.prepend(conversationItem);
+
+            // Adiciona evento de clique ao novo item
+            conversationItem.addEventListener('click', () => {
+                conversationItem.classList.remove('unread'); // Remove a classe 'unread'
+                window.location.href = `/conversations/${message.chat_id}/`;
+            });
+        }
+    }
+
+
+    // Adiciona evento de clique para redirecionar ao chat
+    // Adiciona evento de clique para redirecionar ao chat e marcar como lida
+    document.querySelectorAll('.conversation-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const chatId = item.dataset.chatId;
+            item.classList.remove('unread'); // Remove a classe 'unread'
+            window.location.href = `/conversations/${chatId}/`;
+        });
+    });
+
+</script>
+
+{% endblock %}

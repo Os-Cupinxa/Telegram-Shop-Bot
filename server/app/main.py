@@ -50,18 +50,12 @@ async def shutdown_event():
 
 @sio.event
 async def connect(sid, environ):
-    print(f"Client {sid} connected")
+    print(f"\033[92mINFO:\033[0m     Client {sid} connected to socket.")
 
 
 @sio.event
 async def disconnect(sid):
-    print(f"Client {sid} disconnected")
-
-
-@sio.event
-async def message(sid, data):
-    print(f"Message from {sid}: {data}")
-    await sio.emit("response", {"message": "Message received!"})
+    print(f"\033[92mINFO:\033[0m     Client {sid} disconnected from socket.")
 
 
 app.mount("/socket.io", socket_app)

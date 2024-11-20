@@ -15,8 +15,4 @@ class UserResponse(UserBase):
     id: int
 
     class Config:
-        orm_mode = True
-
-class UserLogin(BaseModel):
-    email: str
-    password: str
+        from_attributes = True

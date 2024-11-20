@@ -1,0 +1,55 @@
+#chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+#messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.message {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.client-message {
+    justify-content: flex-start;
+}
+
+.admin-message {
+    justify-content: flex-end;
+}
+
+.message-content {
+    max-width: 60%;
+    padding: 10px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.client-message .message-content {
+    background-color: #e1ffc7;
+    border-bottom-left-radius: 0;
+}
+
+.admin-message .message-content {
+    background-color: #d0e6ff;
+    border-bottom-right-radius: 0;
+}
+
+.message-timestamp {
+    font-size: 0.8em;
+    color: #555;
+    position: absolute;
+    bottom: -18px;
+    right: 10px;
+}
+
+.form-group {
+    margin-top: 10px;
+}

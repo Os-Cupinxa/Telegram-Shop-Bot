@@ -30,7 +30,9 @@ urlpatterns = [
     #path('clients/delete', views.client_delete, name='client_delete'),
 
     # Broadcast paths
-    #path('broadcast/', views.broadcast, name='broadcast'),
+    # Broadcast path
+    path('broadcast/', views.broadcast_message, name='broadcast'),
+
     #path('broadcast/send', views.broadcast_send, name='broadcast_add'),
 
     # Order paths
@@ -40,5 +42,10 @@ urlpatterns = [
     # Message paths
     path('messages/', views.messages_list, name='messages_list'),
     path('messages/edit/<int:id>/', views.messages_edit, name='messages_edit'),
+
+    # Conversations path
+    path('conversations/', views.conversations_list, name='conversations_list'),
+    path('conversations/<int:chat_id>/', views.conversation_messages, name='conversation_messages'),
+    path('conversations/<int:chat_id>/mark_as_read/', views.mark_conversation_as_read, name='mark_conversation_as_read'),
 
 ]

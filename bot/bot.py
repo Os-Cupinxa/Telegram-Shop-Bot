@@ -175,8 +175,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def main() -> None:
     # SOCKET IS DISABLED FOR NOW BECAUSE IT'S NOT WORKING CORRECTLY IN THE BOT. ALSO FOR NOW THERE IS NO NEED TO USE IT
-    # from socket_config import connect_to_backend
-    # await connect_to_backend()
+    from socket_config import connect_to_backend
+    await connect_to_backend()
 
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
@@ -206,3 +206,5 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+    

@@ -63,6 +63,7 @@ async def process_address(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     context.user_data["new_user"]["address"] = update.message.text
     context.user_data["awaiting_address"] = False
     context.user_data["registering_process"] = False
+    chat_id = update.message.chat.id
 
     new_user_data = {
         "name": context.user_data["new_user"]["name"],
@@ -70,6 +71,7 @@ async def process_address(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         "phone_number": context.user_data["new_user"]["phone_number"],
         "city": context.user_data["new_user"]["city"],
         "address": context.user_data["new_user"]["address"],
+        "chat_id": chat_id
     }
 
     async with httpx.AsyncClient() as client:
