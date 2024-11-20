@@ -16,7 +16,7 @@
   </div>
 
   <div class="form-group row">
-    <label class="col-sm-2">Name:</label>
+    <label class="col-sm-2">Nome:</label>
     <div class="col-sm-10">
       <input class="form-control" name="name" value="{{ category.name }}">
       {% if nameError %}
@@ -35,17 +35,17 @@
     </div>
   </div>
 
-  <button class="btn btn-success" type="submit">Update</button>
+  <button class="btn btn-success" type="submit">Salvar</button>
 </form>
 
 <form method="get" action="{% url 'categories_list' %}">
-  <button class="btn btn-info" type="submit">Back</button>
+  <button class="btn btn-info" type="submit">Voltar</button>
 </form>
 
 <form method="post" action="{% url 'category_delete' %}">
   {% csrf_token %}
   <input type="hidden" name="id" value="{{ category.id }}">
-  <button class="btn btn-danger" type="submit">Delete</button>
+  <button class="btn btn-danger" type="submit">Apagar</button>
 </form>
 
 {% else %}
