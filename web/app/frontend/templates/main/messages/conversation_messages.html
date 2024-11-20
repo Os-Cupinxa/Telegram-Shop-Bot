@@ -1,0 +1,87 @@
+{% extends 'common/home.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+
+<h1>Chat com Cliente</h1>
+
+<div id="chat-container">
+    <div id="messages-container">
+        {% for message in messages %}
+        <div class="message {% if message.client_id %}client-message{% else %}admin-message{% endif %}">
+            <div class="message-content">
+                <p>{{ message.message }}</p>
+                <span class="message-timestamp">{{ message.created_date|date:"H:i" }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <form id="send-message-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="chat_id" value="{{ chat_id }}">
+        <div class="form-group">
+            <textarea class="form-control" name="message" rows="2" placeholder="Digite sua mensagem..."></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Enviar</button>
+    </form>
+</div>
+
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+<script>
+    const socket = io("http://localhost:8001"); // Substitua pela URL do backend
+
+    socket.on("connect", () => {
+        console.log("Conectado ao WebSocket");
+    });
+    socket.on("disconnect", () => {
+        console.log("Desconectado do WebSocket");
+    });
+
+    socket.on("new_message_to_web", (message) => {
+        if (message.chat_id == {{ chat_id }}) {
+            addMessageToContainer(message);
+        }
+    });
+
+    function addMessageToContainer(message) {
+        const container = document.getElementById("messages-container");
+
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message");
+        if (message.client_id) {
+            messageDiv.classList.add("client-message");
+        } else if (message.user_id) {
+            messageDiv.classList.add("admin-message");
+        }
+
+        const contentDiv = document.createElement("div");
+        contentDiv.classList.add("message-content");
+
+        const messageText = document.createElement("p");
+        messageText.textContent = message.message;
+
+        const timestamp = document.createElement("span");
+        timestamp.classList.add("message-timestamp");
+        timestamp.textContent = new Date(message.created_date).toLocaleTimeString();
+
+        contentDiv.appendChild(messageText);
+        contentDiv.appendChild(timestamp);
+
+        messageDiv.appendChild(contentDiv);
+        container.appendChild(messageDiv);
+
+        // Scroll para a última mensagem
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Scroll para a última mensagem ao carregar a página
+    window.onload = function () {
+        const container = document.getElementById("messages-container");
+        container.scrollTop = container.scrollHeight;
+    };
+</script>
+
+{% endblock %}

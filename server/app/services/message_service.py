@@ -10,10 +10,17 @@ from app.schemas.message_schema import MessageCreate
 from app.services.global_service import get_object_by_id
 
 from app.config.env_config import TELEGRAM_API_URL
+from sqlalchemy import and_, func
+from sqlalchemy.orm import joinedload
+from typing import Optional
 
 
-def get_all_messages(db: Session):
-    return db.query(Message).all()
+def get_all_messages(db: Session, chat_id: Optional[int] = None):
+    query = db.query(Message)
+    if chat_id:
+        query = query.filter(Message.chat_id == chat_id)
+    return query.order_by(Message.created_date).all()
+
 
 
 def get_message(db: Session, message_id: int):
@@ -23,6 +30,7 @@ def get_message(db: Session, message_id: int):
 
 
 async def create_message(db: Session, message: MessageCreate):
+    print(message)
     if message.client_id is None:
         user = get_object_by_id(db, User, message.user_id, "User not found")
     else:
@@ -35,6 +43,7 @@ async def create_message(db: Session, message: MessageCreate):
         user_id=message.user_id,
         client_id=message.client_id
     )
+    print(db_message)
     db.add(db_message)
     db.commit()
     db.refresh(db_message)
@@ -97,6 +106,8 @@ async def send_to_client(db_message: Message, client: Client):
         "chat_id": db_message.chat_id,
         "message": db_message.message,
         "created_date": created_date_str,
+        "client_id": db_message.client_id,
+        "user_id": db_message.user_id,
         "client": client_data
     })
 
@@ -157,3 +168,34 @@ def delete_message(db: Session, message_id: int):
     db.delete(db_message)
     db.commit()
     return {"message": "Message deleted"}
+
+def get_active_conversations(db: Session):
+    # Subconsulta para obter a última mensagem de cada chat_id
+    subquery = (
+        db.query(
+            Message.chat_id,
+            func.max(Message.id).label('max_id')
+        ).group_by(Message.chat_id).subquery()
+    )
+
+    # Consulta principal para obter as últimas mensagens e informações do cliente
+    latest_messages = (
+        db.query(Message)
+        .join(subquery, and_(Message.chat_id == subquery.c.chat_id, Message.id == subquery.c.max_id))
+        .options(joinedload(Message.client))
+        .order_by(Message.created_date.desc())
+        .all()
+    )
+
+    conversations = []
+    for message in latest_messages:
+        conversation = {
+            "chat_id": message.chat_id,
+            "last_message": message.message,
+            "last_message_date": message.created_date,
+            "client_id": message.client_id,
+            "client_name": message.client.name if message.client else None,
+            "status": message.status
+        }
+        conversations.append(conversation)
+    return conversations

@@ -1,17 +1,19 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.schemas.message_schema import MessageCreate, MessageResponse
+from app.schemas.message_schema import MessageCreate, MessageResponse, ConversationResponse
 from app.services import message_service
 from app.config.database import get_db
 from app.utils.access_token import get_current_user
 
+from typing import Optional
 router = APIRouter()
 
 
 @router.get("/messages/", response_model=List[MessageResponse], tags=["Messages"])
-def read_messages(db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
-    return message_service.get_all_messages(db)
+def read_messages(chat_id: Optional[int] = None, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    return message_service.get_all_messages(db, chat_id)
+
 
 
 @router.get("/messages/{message_id}", response_model=MessageResponse, tags=["Messages"])
@@ -39,3 +41,9 @@ def update_message(message_id: int, message: MessageCreate, db: Session = Depend
 @router.delete("/messages/{message_id}", tags=["Messages"])
 def delete_message(message_id: int, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
     return message_service.delete_message(db, message_id)
+
+
+
+@router.get("/conversations/", response_model=List[ConversationResponse], tags=["Conversations"])
+def get_conversations(db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    return message_service.get_active_conversations(db)

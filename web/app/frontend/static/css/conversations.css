@@ -1,0 +1,42 @@
+#conversations-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.conversation-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.conversation-item:hover {
+    background-color: #f5f5f5;
+}
+
+.conversation-item.unread {
+    background-color: #e6f7ff;
+}
+
+.conversation-info h4 {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.conversation-info p {
+    margin: 5px 0 0 0;
+    color: #555;
+}
+
+.conversation-timestamp {
+    display: flex;
+    align-items: center;
+    color: #999;
+}
+
+.conversation-item.unread .conversation-info h4,
+.conversation-item.unread .conversation-info p {
+    font-weight: bold;
+}
