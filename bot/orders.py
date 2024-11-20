@@ -134,8 +134,8 @@ async def get_order_details(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         order_text += (
             f"🛍️ *Produto:* {product['name']}\n"
             f"🔢 *Quantidade:* {quantity}\n"
-            f"💵 *Valor unitário:* R${unit_price:.2f}\n"
-            f"💰 *Total:* R${total_price:.2f}\n"
+            f"💵 *Valor unitário:* R$ {unit_price:.2f}\n"
+            f"💰 *Total:* R$ {total_price:.2f}\n"
             f"--------------------------------------------------\n"
         )
 

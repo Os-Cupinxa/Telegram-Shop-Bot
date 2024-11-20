@@ -64,7 +64,7 @@ def populate_products():
     data = []
     for _ in range(1000):
         category_id = random.randint(1, 10)
-        photo_url = "https://picsum.photos/200/200"
+        photo_url = f"https://loremflickr.com/200/200/food"
         name = fake.word().capitalize()
         description = fake.text(max_nb_chars=100)
         price = round(random.uniform(10.00, 100.00), 2)

@@ -42,12 +42,9 @@ async def handle_quantity(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             cart.append({'product_id': product['id'], 'quantity': quantity, 'product': product})
 
         confirmation_message = (
-            f"Adicionado ao carrinho:\n"
-            f"**Produto:** {product['name']}\n"
-            f"**Quantidade:** {quantity}\n"
-            f"**Valor unitário:** R${unit_price:.2f}\n"
-            f"**Total:** R${total_price:.2f}"
+            f"➕ *{quantity} x {product['name']}* adicionados ao carrinho por R$ {total_price:.2f}!"
         )
+
         await update.message.reply_text(confirmation_message, parse_mode='Markdown')
 
         context.user_data['awaiting_quantity'] = False
@@ -92,12 +89,12 @@ async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         cart_message += (
             f"🛍️ *Produto:* {product['name']}\n"
             f"🔢 *Quantidade:* {quantity}\n"
-            f"💵 *Valor unitário:* R${unit_price:.2f}\n"
-            f"💰 *Total:* R${total_price:.2f}\n"
+            f"💵 *Valor unitário:* R$ {unit_price:.2f}\n"
+            f"💰 *Total:* R$ {total_price:.2f}\n"
             f"--------------------------------------------------\n"
         )
 
-    cart_message += f"🛒 *Total do carrinho:* R${total_cart_value:.2f}"
+    cart_message += f"🛒 *Total do carrinho:* R$ {total_cart_value:.2f}"
 
     keyboard = [
         [InlineKeyboardButton("🛒 Finalizar pedido", callback_data="go_to-checkout"),
@@ -124,15 +121,25 @@ async def prompt_remove_item(update: Update, context: ContextTypes.DEFAULT_TYPE)
     keyboard = [
         [
             InlineKeyboardButton(
-                f"❌ {item['product']['name']} - {item['quantity']}x (R${item['quantity'] * item['product']['price']:.2f})",
+                f"❌ {item['product']['name']} - {item['quantity']}x "
+                f"(R$ {item['quantity'] * item['product']['price']:.2f})",
                 callback_data=f"confirm_remove_item-{item['product_id']}"
             )
         ]
         for item in cart
     ]
+
+    keyboard.append([
+        InlineKeyboardButton(
+            "🗑️ Limpar Carrinho",
+            callback_data="confirm_clean_cart"
+        )
+    ])
+
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await query.message.reply_text("Selecione o item que deseja remover:", reply_markup=reply_markup)
+    await query.message.reply_text("Selecione o item que deseja remover ou limpe o carrinho:",
+                                   reply_markup=reply_markup)
 
 
 async def confirm_remove_from_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -146,4 +153,14 @@ async def confirm_remove_from_cart(update: Update, context: ContextTypes.DEFAULT
     context.user_data['cart'] = cart
 
     await query.message.reply_text("✔️ Item removido do carrinho.")
+    await show_cart(update, context)
+
+
+async def confirm_clean_cart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+
+    context.user_data['cart'] = []
+
+    await query.message.reply_text("✔️ Seu carrinho foi limpo com sucesso!")
     await show_cart(update, context)

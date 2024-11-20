@@ -14,7 +14,8 @@ from telegram.ext import (
 from account import log_in, check_user_by_cpf, choose_info_to_edit, show_user_info, update_name, update_phone, \
     update_city, update_address, edit_name, edit_phone, edit_city, edit_address
 from env_config import TELEGRAM_BOT_TOKEN
-from cart import show_cart, handle_quantity, add_to_cart, prompt_remove_item, confirm_remove_from_cart
+from cart import show_cart, handle_quantity, add_to_cart, prompt_remove_item, confirm_remove_from_cart, \
+    confirm_clean_cart
 from catalogue import show_catalogue_categories, get_products, navigate_product
 from chat import start_chat, save_message
 from checkout import checkout, confirm_order
@@ -22,7 +23,6 @@ from orders import get_orders, navigate_order, get_order_details
 from registering import process_name, process_phone, process_city, process_address
 
 nest_asyncio.apply()
-
 
 # Enable logging
 logging.basicConfig(
@@ -32,18 +32,38 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    reply_keyboard = [
-        [InlineKeyboardButton("🛒 Carrinho", callback_data=f"go_to-cart"),
-         InlineKeyboardButton("📦 Catálogo", callback_data=f"go_to-catalogue"),
-         InlineKeyboardButton("🙋 Efetuar Login", callback_data=f"go_to-login")]
-    ]
 
-    start_text = (
-        "Olá! Seja bem-vindo à loja. Como posso ajudar?\n"
-        "Digite /ajuda para exibir a lista de comandos \n"
-        "ou selecione uma das opções abaixo\n"
-    )
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_info = context.user_data.get('user_info', {})
+
+    if user_info:
+        reply_keyboard = [
+            [
+                InlineKeyboardButton("🛒 Carrinho", callback_data=f"go_to-cart"),
+                InlineKeyboardButton("📦 Catálogo", callback_data=f"go_to-catalogue"),
+                InlineKeyboardButton("👤 Ver Conta", callback_data=f"go_to-profile")
+            ]
+        ]
+        start_text = (
+            f"Olá, {user_info.get('name', 'Usuário')}! Seja bem-vindo de volta à loja. 😊\n"
+            "Como posso ajudar hoje?\n"
+            "Digite /ajuda para exibir a lista de comandos \n"
+            "ou selecione uma das opções abaixo.\n"
+        )
+    else:
+        reply_keyboard = [
+            [
+                InlineKeyboardButton("🛒 Carrinho", callback_data=f"go_to-cart"),
+                InlineKeyboardButton("📦 Catálogo", callback_data=f"go_to-catalogue"),
+                InlineKeyboardButton("🙋 Efetuar Login", callback_data=f"go_to-login")
+            ]
+        ]
+        start_text = (
+            "Olá! Seja bem-vindo à loja. 😊\n"
+            "Você não está logado no momento.\n"
+            "Digite /ajuda para exibir a lista de comandos \n"
+            "ou selecione uma das opções abaixo.\n"
+        )
 
     await update.message.reply_text(
         start_text,
@@ -58,7 +78,7 @@ async def go_to(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     page = query.data.split("-")[1]
 
     if page == "catalogue":
-        await show_catalogue_categories(query, context)
+        await show_catalogue_categories(update, context)
 
     elif page == "cart":
         await show_cart(update, context)
@@ -143,6 +163,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "🔹 /iniciar - Iniciar a conversa\n"
         "🔹 /cancelar - Cancelar a conversa\n"
         "🔹 /carrinho - Ver seu carrinho de compras\n"
+        "🔹 /catalogo - Exibir o catálogo da loja\n"
         "🔹 /chat - Iniciar conversa com atendente\n"
         "🔹 /conta - Ver informações da sua conta\n"
         "🔹 /ajuda - Mostrar esta lista de comandos\n"
@@ -163,6 +184,7 @@ async def main() -> None:
     application.add_handler(CommandHandler("iniciar", start))
     application.add_handler(CommandHandler("cancelar", cancel))
     application.add_handler(CommandHandler("carrinho", show_cart))
+    application.add_handler(CommandHandler("catalogo", show_catalogue_categories))
     application.add_handler(CommandHandler("chat", start_chat))
     application.add_handler(CommandHandler("conta", show_user_info))
     application.add_handler(CommandHandler("ajuda", help_command))
@@ -175,6 +197,7 @@ async def main() -> None:
     application.add_handler(CallbackQueryHandler(get_order_details, pattern=r'see_order_details-.*'))
     application.add_handler(CallbackQueryHandler(prompt_remove_item, pattern=r'prompt_remove_item'))
     application.add_handler(CallbackQueryHandler(confirm_remove_from_cart, pattern=r'confirm_remove_item-.*'))
+    application.add_handler(CallbackQueryHandler(confirm_clean_cart, pattern=r'confirm_clean_cart'))
 
     application.add_handler(MessageHandler((filters.TEXT | filters.CONTACT) & ~filters.COMMAND, handle_input))
 
