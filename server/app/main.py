@@ -40,22 +40,22 @@ app.include_router(message_controller.router)
 
 @app.on_event("startup")
 async def startup_event():
-    print("\033[92mINFO:\033[0m     Socket server has started.")
+    print("\033[32mINFO:\033[0m     Socket server has started.")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    print("\033[92mINFO:\033[0m     Socket server is shutting down.")
+    print("\033[32mINFO:\033[0m     Socket server is shutting down.")
 
 
 @sio.event
 async def connect(sid, environ):
-    print(f"\033[92mINFO:\033[0m     Client {sid} connected to socket.")
+    print(f"\033[32mINFO:\033[0m     Client {sid} connected to socket.")
 
 
 @sio.event
 async def disconnect(sid):
-    print(f"\033[92mINFO:\033[0m     Client {sid} disconnected from socket.")
+    print(f"\033[32mINFO:\033[0m     Client {sid} disconnected from socket.")
 
 
 app.mount("/socket.io", socket_app)

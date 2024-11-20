@@ -115,7 +115,7 @@ async def notify_client_of_status_update(db_order: Order):
         response = await client.post(TELEGRAM_API_URL, params=payload)
         if response.status_code == 200:
             print(f"Message successfully sent to chat_id {chat_id}")
-            print(f"\033[92mINFO:\033[0m     Order message successfully sent to chat_id {chat_id}")
+            print(f"\033[32mINFO:\033[0m     Order message successfully sent to chat_id {chat_id}")
         else:
             print(f"\033[91mERROR:\033[0m    Failed to send order message. Status code: "
                   f"{response.status_code}, Response: {response.text}")

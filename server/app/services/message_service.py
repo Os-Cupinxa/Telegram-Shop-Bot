@@ -101,7 +101,7 @@ async def send_to_bot(db_message: Message, name: str):
         response = await client.post(TELEGRAM_API_URL, params=payload)
         if response.status_code == 200:
             print(f"Message successfully sent to chat_id {chat_id}")
-            print(f"\033[92mINFO:\033[0m     Message successfully sent to chat_id {chat_id}")
+            print(f"\033[32mINFO:\033[0m     Message successfully sent to chat_id {chat_id}")
         else:
             print(f"\033[91mERROR:\033[0m    Failed to send message. Status code: "
                   f"{response.status_code}, Response: {response.text}")
@@ -137,7 +137,7 @@ async def send_broadcast_message(db: Session, message: str, user_id: int):
     chat_ids = db.query(Message.chat_id).filter(Message.chat_id.isnot(None)).distinct().all()
 
     if not chat_ids:
-        print("No chat_ids found. Aborting broadcast.")
+        print(f"\033[33mWARNING:\033[0m  No chats found. Aborting broadcast.")
         return
 
     chat_ids = [chat_id[0] for chat_id in chat_ids]
@@ -166,7 +166,7 @@ async def send_broadcast_message(db: Session, message: str, user_id: int):
 
         for response in responses:
             if response.status_code == 200:
-                print(f"\033[92mINFO:\033[0m     Message successfully sent to chat_id: {payload['chat_id']}")
+                print(f"\033[32mINFO:\033[0m     Message successfully sent to chat_id: {payload['chat_id']}")
             else:
                 print(f"\033[91mERROR:\033[0m    Failed to send message. Status code: {response.status_code},"
                       f" Response: {response.text}")
