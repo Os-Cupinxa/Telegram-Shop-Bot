@@ -191,7 +191,6 @@ def delete_message(db: Session, message_id: int):
     return {"message": "Message deleted"}
 
 def get_active_conversations(db: Session):
-    # Subconsulta para obter a última mensagem de cada chat_id
     subquery = (
         db.query(
             Message.chat_id,
@@ -199,7 +198,6 @@ def get_active_conversations(db: Session):
         ).group_by(Message.chat_id).subquery()
     )
 
-    # Consulta principal para obter as últimas mensagens e informações do cliente
     latest_messages = (
         db.query(Message)
         .join(subquery, and_(Message.chat_id == subquery.c.chat_id, Message.id == subquery.c.max_id))

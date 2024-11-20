@@ -59,7 +59,6 @@ def get_conversations(db: Session = Depends(get_db), current_user: int = Depends
 def mark_conversation_as_read(chat_id: int, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
     result = message_service.mark_messages_as_read(db, chat_id)
     from app.main import sio
-    # Emitir evento via Socket.IO
     sio.emit("conversation_marked_as_read", {"chat_id": chat_id})
     return result
 
