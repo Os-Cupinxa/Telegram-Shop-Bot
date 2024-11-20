@@ -134,7 +134,7 @@ async def send_to_client(db_message: Message, client: Client):
 
 
 async def send_broadcast_message(db: Session, message: str, user_id: int):
-    chat_ids = db.query(Message.chat_id).filter(Message.chat_id.isnot(None)).distinct().all()
+    chat_ids = db.query(Client.chat_id).filter(Client.chat_id.isnot(None)).distinct().all()
 
     if not chat_ids:
         print(f"\033[33mWARNING:\033[0m  No chats found. Aborting broadcast.")
