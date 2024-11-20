@@ -8,7 +8,6 @@ from app.controllers import (user_controller,
                              client_controller,
                              message_controller, auth_controller)
 
-
 Base.metadata.create_all(bind=engine)
 
 tags_metadata = [
@@ -51,30 +50,12 @@ async def shutdown_event():
 
 @sio.event
 async def connect(sid, environ):
-    print(f"Client {sid} connected")
+    print(f"\033[92mINFO:\033[0m     Client {sid} connected to socket.")
 
 
 @sio.event
 async def disconnect(sid):
-    print(f"Client {sid} disconnected")
+    print(f"\033[92mINFO:\033[0m     Client {sid} disconnected from socket.")
 
-
-@sio.event
-async def message(sid, data):
-    print(f"Message from {sid}: {data}")
-    await sio.emit("response", {"message": "Message received!"})
-
-@sio.event
-def notify_new_message(db_message):
-    print(f"New message: {db_message}")
-    sio.emit("new_message", {
-        "id": db_message.id,
-        "chat_id": db_message.chat_id,
-        "message": db_message.message,
-        "status": db_message.status,
-        "created_date": str(db_message.created_date),
-        "client_id": db_message.client_id,
-        "user_id": db_message.user_id
-    })
 
 app.mount("/socket.io", socket_app)
