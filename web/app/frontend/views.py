@@ -669,3 +669,26 @@ def messages_edit(request, id):
 
     return render(request, 'main/messages/edit.html', {'messages': message})
 
+
+
+async def broadcast_message(request):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return redirect('login')
+
+    headers = {'Authorization': f'Bearer {token}'}
+
+    if request.method == 'POST':
+        message_text = request.POST.get('message')
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url + "broadcast/?message="+message_text, headers=headers)
+
+        if response.status_code == 200:
+            messages.success(request, 'Mensagem enviada com sucesso para todos os clientes.')
+            return redirect('broadcast')
+        else:
+            messages.error(request, 'Erro ao enviar mensagem de broadcast.')
+            return HttpResponse("Erro ao enviar mensagem de broadcast", status=response.status_code)
+
+    return render(request, 'main/broadcasts/broadcast.html')

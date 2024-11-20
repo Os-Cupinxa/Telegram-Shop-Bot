@@ -30,7 +30,9 @@ urlpatterns = [
     #path('clients/delete', views.client_delete, name='client_delete'),
 
     # Broadcast paths
-    #path('broadcast/', views.broadcast, name='broadcast'),
+    # Broadcast path
+    path('broadcast/', views.broadcast_message, name='broadcast'),
+
     #path('broadcast/send', views.broadcast_send, name='broadcast_add'),
 
     # Order paths
