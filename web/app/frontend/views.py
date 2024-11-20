@@ -581,16 +581,14 @@ async def conversation_messages(request, chat_id):
 
     if request.method == 'POST':
         message_text = request.POST.get('message')
-        user_id = request.COOKIES.get('user_id')  # Ou obtenha do token
 
         message_data = {
             "chat_id": chat_id,
             "message": message_text,
-            "user_id": 1,
         }
 
         async with httpx.AsyncClient() as client:
-            response = await client.post(url + "messages/", json=message_data, headers=headers)
+            response = await client.post(url + "messages/web", json=message_data, headers=headers)
 
         if response.status_code == 200:
             # Redireciona para a mesma página para exibir as mensagens atualizadas

@@ -21,6 +21,11 @@ def read_message(message_id: int, db: Session = Depends(get_db), current_user: i
     return message_service.get_message(db, message_id)
 
 
+@router.post("/messages/web", response_model=MessageResponse, tags=["Messages"])
+async def create_message_web(message: MessageCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    db_message = await message_service.create_message_Web(db, message, current_user)
+    return db_message
+
 @router.post("/messages/", response_model=MessageResponse, tags=["Messages"])
 async def create_message(message: MessageCreate, db: Session = Depends(get_db)):
     db_message = await message_service.create_message(db, message)

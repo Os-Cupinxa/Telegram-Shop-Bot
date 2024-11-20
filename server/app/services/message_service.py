@@ -29,8 +29,30 @@ def get_message(db: Session, message_id: int):
     return db_message
 
 
+async def create_message_Web(db: Session, message: MessageCreate, user_id: int):
+    if message.client_id is None:
+        user = get_object_by_id(db, User, user_id, "User not found")
+    else:
+        client = get_object_by_id(db, Client, message.client_id, "Client not found")
+
+    db_message = Message(
+        chat_id=message.chat_id,
+        created_date=message.created_date,
+        message=message.message,
+        user_id=user_id,
+        client_id=message.client_id
+    )
+    db.add(db_message)
+    db.commit()
+    db.refresh(db_message)
+
+    if message.client_id is None:
+        await send_to_bot(db_message, user.name)
+    else:
+        await send_to_client(db_message, client)
+    return db_message
+
 async def create_message(db: Session, message: MessageCreate):
-    print(message)
     if message.client_id is None:
         user = get_object_by_id(db, User, message.user_id, "User not found")
     else:
