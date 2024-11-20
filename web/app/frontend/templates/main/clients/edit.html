@@ -24,7 +24,7 @@
   </div>
 
   <div class="form-group row">
-    <label class="col-sm-2">Name:</label>
+    <label class="col-sm-2">Nome:</label>
     <div class="col-sm-10">
       <input class="form-control" name="name" value="{{ client.name }}" required>
       {% if nameError %}
@@ -41,7 +41,7 @@
   </div>
 
   <div class="form-group row">
-    <label class="col-sm-2">Phone number:</label>
+    <label class="col-sm-2">Telefone:</label>
     <div class="col-sm-10">
       <input class="form-control" name="phoneNumber" value="{{ client.phone_number }}" required>
       {% if phoneNumberError %}
@@ -51,7 +51,7 @@
   </div>
 
   <div class="form-group row">
-    <label class="col-sm-2">City:</label>
+    <label class="col-sm-2">Cidade:</label>
     <div class="col-sm-10">
       <input class="form-control" name="city" value="{{ client.city }}" required>
       {% if cityError %}
@@ -61,7 +61,7 @@
   </div>
 
   <div class="form-group row">
-    <label class="col-sm-2">Address:</label>
+    <label class="col-sm-2">Endereço:</label>
     <div class="col-sm-10">
       <input class="form-control" name="address" value="{{ client.address }}" required>
       {% if addressError %}
@@ -71,7 +71,7 @@
   </div>
 
   <div class="form-group row">
-    <label class="col-sm-2">Active:</label>
+    <label class="col-sm-2">Ativo:</label>
     <div class="col-sm-10">
       <select class="form-control" name="is_active">
         <option value="1" {% if client.is_active %}selected{% endif %}>Yes</option>
@@ -80,17 +80,17 @@
     </div>
   </div>
 
-  <button class="btn btn-success" type="submit">Update</button>
+  <button class="btn btn-success" type="submit">Salvar</button>
 </form>
 
 <form method="get" action="{% url 'clients_list' %}">
-  <button class="btn btn-info" type="submit">Back</button>
+  <button class="btn btn-info" type="submit">Voltar</button>
 </form>
 
 {% else %}
 <div class="alert alert-danger" role="alert">
   <h4 class="alert-heading">Error</h4>
-  <hr>This client does not exist!
+  <hr>Esse cliente não existe.
 </div>
 {% endif %}
 

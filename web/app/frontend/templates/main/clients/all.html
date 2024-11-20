@@ -9,10 +9,10 @@
   <thead>
     <tr>
       <th>Id</th>
-      <th>Name</th>
-      <th>City</th>
-      <th>Active</th>
-      <th>Action</th>
+      <th>Nome</th>
+      <th>Cidade</th>
+      <th>Ativo</th>
+      <th>Ação</th>
     </tr>
   </thead>
   <tbody>
@@ -21,7 +21,7 @@
       <td>{{ client.id }}</td>
       <td>{{ client.name }}</td>
       <td>{{ client.city }}</td>
-      <td>{% if client.is_active %}Yes{% else %}No{% endif %}</td>
+      <td>{% if client.is_active %}Sim{% else %}Não{% endif %}</td>
       <td>
         <a class="btn btn-xs btn-info" href="{% url 'client_edit' client.id %}">
           <i class="fa fa-pencil" aria-hidden="true"></i>
