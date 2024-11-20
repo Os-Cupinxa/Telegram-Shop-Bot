@@ -11,14 +11,14 @@
   {% csrf_token %}
 
   <div class="form-group row">
-    <label class="col-sm-2">Photo:</label>
+    <label class="col-sm-2">Foto:</label>
     <div class="col-sm-10">
       <input class="form-control" id="photo" type="input" name="photo" placeholder="www.photo.com.br" required>
     </div>
   </div>
 
   <div class="form-group row">
-    <label class="col-sm-2">Name:</label>
+    <label class="col-sm-2">Nome:</label>
     <div class="col-sm-10">
       <input class="form-control" name="name" value="{{ product.name|default_if_none:'' }}">
       {% if nameError %}
@@ -28,7 +28,7 @@
   </div>
 
   <div class="form-group row">
-    <label class="col-sm-2">Description:</label>
+    <label class="col-sm-2">Descrição:</label>
     <div class="col-sm-10">
       <textarea class="form-control" name="description" rows="4">{{ product.description|default_if_none:'' }}</textarea>
       {% if descriptionError %}
@@ -38,7 +38,7 @@
   </div>
 
   <div class="form-group row">
-    <label class="col-sm-2">Category:</label>
+    <label class="col-sm-2">Categoria:</label>
     <div class="col-sm-10">
       <select class="form-control selectpicker" name="category" data-live-search="true" data-size="4">
         {% for category in categories %}
@@ -52,7 +52,7 @@
 
 
   <div class="form-group row">
-    <label class="col-sm-2">Price:</label>
+    <label class="col-sm-2">Preço:</label>
     <div class="col-sm-10">
       <input class="form-control" type="number" name="price" value="{{ product.price|default_if_none:'' }}">
       {% if priceError %}
@@ -61,7 +61,7 @@
     </div>
   </div>
 
-  <button class="btn btn-success" type="submit">Create</button>
+  <button class="btn btn-success" type="submit">Cadastrar</button>
 </form>
 
 <form method="get" action="{% url 'products_list' %}">
