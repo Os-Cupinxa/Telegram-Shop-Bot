@@ -489,6 +489,16 @@ async def orders_list(request):
     if response.status_code == 200:
         orders = response.json()
     
+    # Adicionar nome do cliente a cada pedido
+    for order in orders:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url + "clients/"+str(order['client_id']), headers=headers)
+        
+        if response.status_code == 200:
+            clientRequest = response.json()
+            order['client'] = clientRequest
+        
+    
 
     return render(request, 'main/orders/all.html', {'orders': orders})
 

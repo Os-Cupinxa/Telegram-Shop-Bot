@@ -20,7 +20,7 @@
     {% for order in orders %}
     <tr>
       <td>{{ order.id }}</td>
-      <td>{{ order.client_id }} (<a target="_blank" href="{% url 'client_edit' order.client_id %}">view</a>)</td>
+      <td>{{ order.client.name }} (<a target="_blank" href="{% url 'client_edit' order.client_id %}">view</a>)</td>
       <td>{{ order.created_date}}</td>
       <td>{{ order.status }}</td>
       <td>{{ order.amount }} $</td>
