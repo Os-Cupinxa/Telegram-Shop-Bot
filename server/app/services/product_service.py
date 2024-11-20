@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models import Category, OrderItem
 from app.models.product_model import Product
@@ -7,7 +7,7 @@ from app.services.global_service import get_object_by_id
 
 
 def get_all_products(db: Session):
-    return db.query(Product).all()
+    return db.query(Product).options(joinedload(Product.category)).all()
 
 
 def get_product(db: Session, product_id: int):
@@ -37,7 +37,7 @@ def create_product(db: Session, product: ProductCreate):
 
 
 def update_product(db: Session, product_id: int, product: ProductCreate):
-    
+
     db_product = get_object_by_id(db, Product, product_id, "Product not found")
     get_object_by_id(db, Category, product.category_id, "Category not found")
 
@@ -46,7 +46,7 @@ def update_product(db: Session, product_id: int, product: ProductCreate):
     db_product.name = product.name
     db_product.description = product.description
     db_product.price = product.price
-    
+
     db.commit()
     db.refresh(db_product)
     return db_product

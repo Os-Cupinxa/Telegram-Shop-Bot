@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional
 
+from app.schemas.category_schema import CategoryResponse
+
 
 class ProductBase(BaseModel):
     category_id: Optional[int] = None
@@ -16,6 +18,7 @@ class ProductCreate(ProductBase):
 
 class ProductResponse(ProductBase):
     id: int
+    category: Optional[CategoryResponse] = None
 
     class Config:
         from_attributes = True
