@@ -91,12 +91,13 @@ def populate_clients():
         city = fake.city()
         address = fake.address()
         is_active = fake.boolean()
+        chat_id = random.randint(1, 100)
 
-        data.append((name, cpf, phone_number, city, address, is_active))
+        data.append((name, cpf, phone_number, city, address, is_active, chat_id))
 
     query = """
-        INSERT INTO clients (name, cpf, phone_number, city, address, is_active)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO clients (name, cpf, phone_number, city, address, is_active, chat_id)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
 
     try:

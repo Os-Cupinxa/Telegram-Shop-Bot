@@ -30,6 +30,10 @@ class OrderCreate(OrderBase):
     items: List[OrderItemBase]
 
 
+class OrderUpdate(OrderBase):
+    pass
+
+
 class OrderResponse(OrderBase):
     id: int
     created_date: datetime
