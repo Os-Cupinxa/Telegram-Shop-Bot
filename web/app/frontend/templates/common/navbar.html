@@ -11,21 +11,20 @@
 
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li><a href="{% url 'clients_list' %}"><i class="fa fa-users mr-1"></i>Clients</a></li>
-                <li><a href="{% url 'categories_list' %}"><i class="fa fa-folder-open mr-1"></i>Categories</a></li>
-                <li><a href="{% url 'products_list' %}"><i class="fa fa-archive mr-1"></i>Products</a></li>
-                <li><a href="{% url 'orders_list' %}"><i class="fa fa-cart-arrow-down mr-1"></i>Orders</a></li>
-                <li><a href="{% url 'broadcast' %}"> <i class="fa fa-comment mr-1"></i>Broadcasts</a></li>
+                <li><a href="{% url 'clients_list' %}"><i class="fa fa-users mr-1"></i>Clientes</a></li>
+                <li><a href="{% url 'categories_list' %}"><i class="fa fa-folder-open mr-1"></i>Categorias</a></li>
+                <li><a href="{% url 'products_list' %}"><i class="fa fa-archive mr-1"></i>Produtos</a></li>
+                <li><a href="{% url 'orders_list' %}"><i class="fa fa-cart-arrow-down mr-1"></i>Pedidos</a></li>
+                <li><a href="{% url 'broadcast' %}"> <i class="fa fa-comment mr-1"></i>Transmissão</a></li>
 
-                <li><a href="{% url 'conversations_list' %}"><i class="fa fa-envelope mr-1"></i>Messages</a></li>
-                <li><a href="{% url 'users_list' %}"><i class="fa fa-user-secret mr-1"></i>Users</a></li>
-
+                <li><a href="{% url 'conversations_list' %}"><i class="fa fa-envelope mr-1"></i>Mensagens</a></li>
+                <li><a href="{% url 'users_list' %}"><i class="fa fa-user-secret mr-1"></i>Usuários</a></li>
             </ul>
 
             <div class="navbar-text pull-right">
                 <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}
-                    <input type="submit" class="btn btn-xs btn-warning" value="Log out" />
+                    <input type="submit" class="btn btn-xs btn-warning" value="Sair" />
                 </form>
             </div>
 
