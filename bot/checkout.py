@@ -45,7 +45,7 @@ async def confirm_order(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     order_data = {
         "client_id": user_info['id'],
-        "status": "pending",
+        "status": "Pendente",
         "amount": round(total_amount, 2),
         "items": cart_items
     }
