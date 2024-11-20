@@ -53,7 +53,7 @@ async def login_view(request):
         response = await client.post(
             url + "login/",
             headers=headers,
-            data=form_data 
+            data=form_data
         )
 
     if response.status_code == 200:
@@ -185,19 +185,12 @@ async def products_list(request):
 
     headers = {'Authorization': f'Bearer {token}'}
 
+    products = []
+
     async with httpx.AsyncClient() as client:
         response = await client.get(url + "products/", headers=headers)
     if response.status_code == 200:
         products = response.json()
-
-    # Adicionar nome da categoria a cada produto
-    for product in products:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url + "categories/"+str(product['category_id']), headers=headers)
-        
-        if response.status_code == 200:
-            category = response.json()
-            product['category'] = category
 
     return render(request, 'main/products/all.html', {'products': products})
 
@@ -423,7 +416,7 @@ async def clients_list(request):
 async def client_edit(request, id):
     token = request.COOKIES.get('access_token')
     if not token:
-        return redirect('login') 
+        return redirect('login')
 
     headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
 
@@ -497,17 +490,17 @@ async def orders_list(request):
 
     if response.status_code == 200:
         orders = response.json()
-    
+
     # Adicionar nome do cliente a cada pedido
     for order in orders:
         async with httpx.AsyncClient() as client:
             response = await client.get(url + "clients/"+str(order['client_id']), headers=headers)
-        
+
         if response.status_code == 200:
             clientRequest = response.json()
             order['client'] = clientRequest
-        
-    
+
+
 
     return render(request, 'main/orders/all.html', {'orders': orders})
 
@@ -536,11 +529,11 @@ async def order_edit(request, id):
                 order['items'] = items_response.json()  # Adiciona os itens ao pedido
             else:
                 order['items'] = []  # Caso dê erro, atribuir lista vazia
-            
-            
+
+
             async with httpx.AsyncClient() as client:
                 response = await client.get(url + "clients/"+str(order['client_id']), headers=headers)
-            
+
             if response.status_code == 200:
                 clientRequest = response.json()
                 order['client'] = clientRequest
