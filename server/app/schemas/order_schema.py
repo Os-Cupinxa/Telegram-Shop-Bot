@@ -11,7 +11,7 @@ class OrderItemBase(BaseModel):
     quantity: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class OrderItemResponse(BaseModel):
@@ -35,4 +35,4 @@ class OrderResponse(OrderBase):
     created_date: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
