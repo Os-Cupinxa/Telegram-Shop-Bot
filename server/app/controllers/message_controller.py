@@ -25,6 +25,11 @@ async def create_message(message: MessageCreate, db: Session = Depends(get_db)):
     return db_message
 
 
+@router.post("/broadcast/", tags=["Messages"])
+async def send_broadcast(message: str, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    await message_service.send_broadcast_message(db, message, current_user)
+
+
 @router.put("/messages/", response_model=MessageResponse, tags=["Messages"])
 def update_message(message_id: int, message: MessageCreate, db: Session = Depends(get_db),
                    current_user: int = Depends(get_current_user)):

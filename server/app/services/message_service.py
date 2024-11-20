@@ -40,7 +40,7 @@ async def create_message(db: Session, message: MessageCreate):
     db.refresh(db_message)
 
     if message.client_id is None:
-        asyncio.run(send_to_bot(db_message, user.name))
+        await send_to_bot(db_message, user.name)
     else:
         await send_to_client(db_message, client)
     return db_message
@@ -92,7 +92,6 @@ async def send_to_client(db_message: Message, client: Client):
 
     created_date_str = db_message.created_date.isoformat()
 
-    print(f"Message sent to client: {client_data}")
     await sio.emit("new_message_to_web", {
         "id": db_message.id,
         "chat_id": db_message.chat_id,
@@ -100,6 +99,47 @@ async def send_to_client(db_message: Message, client: Client):
         "created_date": created_date_str,
         "client": client_data
     })
+
+
+async def send_broadcast_message(db: Session, message: str, user_id: int):
+    chat_ids = db.query(Message.chat_id).filter(Message.chat_id.isnot(None)).distinct().all()
+
+    if not chat_ids:
+        print("No chat_ids found. Aborting broadcast.")
+        return
+
+    chat_ids = [chat_id[0] for chat_id in chat_ids]
+
+    user = get_object_by_id(db, User, user_id, "User not found")
+    user_name = user.name
+
+    escaped_user_name = escape_markdown(user_name)
+    escaped_message = escape_markdown(message)
+
+    formatted_message = f"*{escaped_user_name}:*\n{escaped_message}"
+
+    payload = {
+        'text': formatted_message,
+        'parse_mode': 'Markdown'
+    }
+
+    async with httpx.AsyncClient() as client:
+        tasks = []
+        for chat_id in chat_ids:
+            payload['chat_id'] = chat_id
+            task = client.post(TELEGRAM_API_URL, params=payload)
+            tasks.append(task)
+
+        responses = await asyncio.gather(*tasks)
+
+        for response in responses:
+            if response.status_code == 200:
+                print(f"\033[92mINFO:\033[0m     Message successfully sent to chat_id: {payload['chat_id']}")
+            else:
+                print(f"\033[91mERROR:\033[0m    Failed to send message. Status code: {response.status_code},"
+                      f" Response: {response.text}")
+
+    return {"message": "Broadcast completed"}
 
 
 def update_message(db: Session, message_id: int, message: MessageCreate):
