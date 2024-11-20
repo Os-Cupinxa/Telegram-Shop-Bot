@@ -18,6 +18,9 @@ from django.http import HttpResponseRedirect
 
 import httpx
 import asyncio
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from app.env_config import SERVER_URL
 
@@ -615,6 +618,24 @@ async def conversation_messages(request, chat_id):
         return render(request, 'main/messages/conversation_messages.html', {'messages': messages, 'chat_id': chat_id})
 
     return HttpResponse("Erro ao obter mensagens", status=response.status_code)
+
+@csrf_exempt
+def mark_conversation_as_read(request, chat_id):
+    token = request.COOKIES.get('access_token')
+    if not token:
+        return JsonResponse({"error": "Usuário não autenticado"}, status=401)
+
+    headers = {'Authorization': f'Bearer {token}'}
+
+    if request.method == 'POST':
+        response = requests.post(f"{url}conversations/{chat_id}/mark_as_read", headers=headers)
+        if response.status_code == 200:
+            return JsonResponse({"message": "Conversa marcada como lida"})
+        else:
+            return JsonResponse({"error": "Erro ao marcar conversa como lida"}, status=response.status_code)
+    else:
+        return JsonResponse({"error": "Método não permitido"}, status=405)
+
 
 
 # Exibição da lista de mensagens (via HTTP)

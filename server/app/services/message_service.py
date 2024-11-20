@@ -199,3 +199,10 @@ def get_active_conversations(db: Session):
         }
         conversations.append(conversation)
     return conversations
+
+def mark_messages_as_read(db: Session, chat_id: int):
+    messages = db.query(Message).filter(Message.chat_id == chat_id, Message.status == 'unread').all()
+    for message in messages:
+        message.status = 'read'
+    db.commit()
+    return {"message": "Messages marked as read"}

@@ -84,4 +84,31 @@
     };
 </script>
 
+<script>
+    // Função para marcar a conversa como lida
+    function markConversationAsRead() {
+        fetch(`/conversations/{{ chat_id }}/mark_as_read/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+            // Atualiza o item da conversa na lista (opcional)
+            socket.emit('conversation_read', { chat_id: {{ chat_id }} });
+        })
+        .catch(error => console.error('Erro ao marcar como lida:', error));
+    }
+
+    // Chama a função ao carregar a página
+    window.onload = function () {
+        const container = document.getElementById("messages-container");
+        container.scrollTop = container.scrollHeight;
+        markConversationAsRead();
+    };
+</script>
+
+
 {% endblock %}

@@ -47,3 +47,14 @@ def delete_message(message_id: int, db: Session = Depends(get_db), current_user:
 @router.get("/conversations/", response_model=List[ConversationResponse], tags=["Conversations"])
 def get_conversations(db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
     return message_service.get_active_conversations(db)
+
+
+
+@router.post("/conversations/{chat_id}/mark_as_read", tags=["Conversations"])
+def mark_conversation_as_read(chat_id: int, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    result = message_service.mark_messages_as_read(db, chat_id)
+    from app.main import sio
+    # Emitir evento via Socket.IO
+    sio.emit("conversation_marked_as_read", {"chat_id": chat_id})
+    return result
+

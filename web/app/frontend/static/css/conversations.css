@@ -16,9 +16,28 @@
     background-color: #f5f5f5;
 }
 
+/* Adiciona uma borda azul à esquerda das conversas não lidas */
 .conversation-item.unread {
+    border-left: 5px solid #007bff;
     background-color: #e6f7ff;
+    animation: pulse 1s infinite;
 }
+
+/* Animação de pulsação */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 15px rgba(0, 123, 255, 1);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+}
+
 
 .conversation-info h4 {
     margin: 0;
