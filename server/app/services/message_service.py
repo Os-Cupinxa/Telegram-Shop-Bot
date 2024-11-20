@@ -134,13 +134,13 @@ async def send_to_client(db_message: Message, client: Client):
 
 
 async def send_broadcast_message(db: Session, message: str, user_id: int):
-    chat_ids = db.query(Client.chat_id).filter(Client.chat_id.isnot(None)).distinct().all()
+    clients = db.query(Client.chat_id).filter(Client.chat_id.isnot(None)).distinct().all()
 
-    if not chat_ids:
+    if not clients:
         print(f"\033[33mWARNING:\033[0m  No chats found. Aborting broadcast.")
         return
 
-    chat_ids = [chat_id[0] for chat_id in chat_ids]
+    chat_ids = [chat_id[0] for chat_id in clients]
 
     user = get_object_by_id(db, User, user_id, "User not found")
     user_name = user.name
@@ -150,26 +150,25 @@ async def send_broadcast_message(db: Session, message: str, user_id: int):
 
     formatted_message = f"*{escaped_user_name}:*\n{escaped_message}"
 
-    payload = {
-        'text': formatted_message,
-        'parse_mode': 'Markdown'
-    }
-
     async with httpx.AsyncClient() as client:
         tasks = []
         for chat_id in chat_ids:
-            payload['chat_id'] = chat_id
-            task = client.post(TELEGRAM_API_URL, params=payload)
+            task_payload = {
+                'chat_id': chat_id,
+                'text': formatted_message,
+                'parse_mode': 'Markdown'
+            }
+            task = client.post(TELEGRAM_API_URL, params=task_payload)
             tasks.append(task)
 
         responses = await asyncio.gather(*tasks)
 
-        for response in responses:
+        for chat_id, response in zip(chat_ids, responses):
             if response.status_code == 200:
-                print(f"\033[32mINFO:\033[0m     Message successfully sent to chat_id: {payload['chat_id']}")
+                print(f"\033[32mINFO:\033[0m     Message successfully sent to chat_id: {chat_id}")
             else:
-                print(f"\033[91mERROR:\033[0m    Failed to send message. Status code: {response.status_code},"
-                      f" Response: {response.text}")
+                print(f"\033[91mERROR:\033[0m    Failed to send message to chat_id: {chat_id}. "
+                      f"Status code: {response.status_code}, Response: {response.text}")
 
     return {"message": "Broadcast completed"}
 
