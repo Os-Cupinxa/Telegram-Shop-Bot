@@ -36,9 +36,11 @@
         <label class="col-sm-2">Status:</label>
         <div class="col-sm-10">
           <select class="form-control" name="status">
-            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
-            <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Completed</option>
-            <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
+            <option value="Cancelado" {% if order.status == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+            <option value="Pendente" {% if order.status == 'Pendente' %}selected{% endif %}>Pendente</option>
+            <option value="Pedido Aceito" {% if order.status == 'Pedido Aceito' %}selected{% endif %}>Pedido Aceito</option>
+            <option value="A caminho" {% if order.status == 'A caminho' %}selected{% endif %}>A caminho</option>
+            <option value="Entregue" {% if order.status == 'Entregue' %}selected{% endif %}>Entregue</option>
           </select>
         </div>
       </div>
