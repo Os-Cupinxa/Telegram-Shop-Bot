@@ -190,6 +190,15 @@ async def products_list(request):
     if response.status_code == 200:
         products = response.json()
 
+    # Adicionar nome da categoria a cada produto
+    for product in products:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url + "categories/"+str(product['category_id']), headers=headers)
+        
+        if response.status_code == 200:
+            category = response.json()
+            product['category'] = category
+
     return render(request, 'main/products/all.html', {'products': products})
 
 

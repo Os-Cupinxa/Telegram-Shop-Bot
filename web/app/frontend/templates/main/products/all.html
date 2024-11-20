@@ -20,8 +20,8 @@
     <tr>
       <td>{{ product.id }}</td>
       <td>{{ product.name }}</td>
-      <td>{% if product.category_id %}{{ product.category_id }}{% else %}—{% endif %}</td>
-      <td>{{ product.price }} $</td>
+      <td>{% if product.category_id %}{{ product.category.emoji }}{{ product.category.name }}{% else %}—{% endif %}</td>
+      <td>R$ {{ product.price }} </td>
       <td>
         <a class="btn btn-xs btn-info" href="{% url 'product_edit' product.id %}">
           <i class="fa fa-pencil" aria-hidden="true"></i>

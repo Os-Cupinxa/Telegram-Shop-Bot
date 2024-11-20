@@ -23,7 +23,7 @@
       <td>{{ order.client.name }} (<a target="_blank" href="{% url 'client_edit' order.client_id %}">view</a>)</td>
       <td>{{ order.created_date }}</td>
       <td>{{ order.status }}</td>
-      <td>{{ order.amount }} $</td>
+      <td>R$ {{ order.amount }}</td>
       <td>
         <a class="btn btn-xs btn-info" href="{% url 'order_edit' order.id %}">
           <i class="fa fa-pencil" aria-hidden="true"></i>
