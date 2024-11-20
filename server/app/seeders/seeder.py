@@ -62,7 +62,7 @@ def populate_categories():
 
 def populate_products():
     data = []
-    for _ in range(1000):
+    for _ in range(100):
         category_id = random.randint(1, 10)
         photo_url = f"https://loremflickr.com/200/200/food"
         name = fake.word().capitalize()
