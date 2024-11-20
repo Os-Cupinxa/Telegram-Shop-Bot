@@ -34,37 +34,36 @@ async def login_view(request):
 
     if request.method == 'GET':
         return render(request, 'login.html')
+
     username = request.POST.get('username')
     password = request.POST.get('password')
 
-    formData = httpx.QueryParams({
+    # Corpo da requisição no formato application/x-www-form-urlencoded
+    form_data = {
         'grant_type': 'password',
         'username': username,
-        'password': password
-    })
+        'password': password,
+    }
 
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.post(url + "login/", headers=headers, content=formData)
+        response = await client.post(
+            url + "login/",
+            headers=headers,
+            data=form_data 
+        )
 
     if response.status_code == 200:
-        # Salvar o token de autenticação de acess token no cookie
         response_json = response.json()
         redirect_response = HttpResponseRedirect('users')
         redirect_response.set_cookie('access_token', response_json['access_token'])
         return redirect_response
     else:
-        return render(request, 'login.html')
+        return render(request, 'login.html', {'error': 'Login failed. Please try again.'})
 
-
-
-def sync_login_view(request):
-    return asyncio.run(login_view(request))
-
-# Atualize suas URLs para usar sync_login_view em vez de login_view
 
 
 
