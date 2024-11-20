@@ -13,6 +13,7 @@
     <tr>
       <th>Id</th>
       <th>Nome</th>
+      <th>Emoji</th>
       <th>Ação</th>
     </tr>
   </thead>
@@ -21,6 +22,7 @@
     <tr>
       <td>{{ category.id }}</td>
       <td>{{ category.name }}</td>
+      <td>{{ category.emoji }}</td>
       <td>
         <a class="btn btn-xs btn-info" href="{% url 'category_edit' category.id %}">
           <i class="fa fa-pencil" aria-hidden="true"></i>
