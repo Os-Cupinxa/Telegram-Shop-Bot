@@ -159,9 +159,9 @@ def populate_order_item():
 add_test_user()
 populate_categories()
 populate_products()
-populate_clients()
-populate_orders()
-populate_order_item()
+# populate_clients()
+# populate_orders()
+# populate_order_item()
 
 cursor.close()
 conn.close()
