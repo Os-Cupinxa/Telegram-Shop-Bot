@@ -184,6 +184,7 @@ async def update_address(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 async def update_user_in_database(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_info = context.user_data.get('user_info', {})
+    chat_id = update.message.chat.id
 
     if not user_info:
         await update.message.reply_text("❌ Não foi possível encontrar os dados do usuário para atualizar.")
@@ -191,6 +192,7 @@ async def update_user_in_database(update: Update, context: ContextTypes.DEFAULT_
 
     payload = {
         "name": user_info.get('name'),
+        "chat_id": chat_id,
         "cpf": user_info.get('cpf'),
         "phone_number": user_info.get('phone_number'),
         "city": user_info.get('city'),
