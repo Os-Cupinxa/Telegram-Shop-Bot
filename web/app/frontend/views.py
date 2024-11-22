@@ -433,6 +433,7 @@ async def client_edit(request, id):
     # Lidar com requisições PUT
     if request.method == 'POST':
         name = request.POST.get('name')
+        chat_id = request.POST.get('chat_id')
         cpf = request.POST.get('cpf')
         phoneNumber = request.POST.get('phoneNumber')
         city = request.POST.get('city')
@@ -456,6 +457,7 @@ async def client_edit(request, id):
         # Dados do cliente
         dataClient = {
             "name": name,
+            "chat_id": chat_id,
             "cpf": cpf,
             "phone_number": phoneNumber,
             "city": city,
